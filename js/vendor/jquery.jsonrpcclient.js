@@ -54,6 +54,17 @@
   /// The next JSON-RPC request id.
   $.JsonRpcClient.prototype._current_id = 1;
 
+  /// The prior JSON-RPC request.
+  $.JsonRpcClient.prototype._prior_request = '';
+
+  /**
+   * @fn getPriorRequest
+   * @memberof $.JsonRpcClient
+   */
+  $.JsonRpcClient.prototype.getPriorRequest = function() {
+    return this._prior_request;
+  }
+
   /**
    * @fn call
    * @memberof $.JsonRpcClient
@@ -71,6 +82,8 @@
       params  : params,
       id      : this._current_id++  // Increase the id counter to match request/response
     };
+
+    this._prior_request = request;
 
     // Try making a WebSocket call.
     var socket = this.options.getSocket(this.wsOnMessage);

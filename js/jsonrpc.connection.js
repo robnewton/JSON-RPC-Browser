@@ -1,7 +1,10 @@
-function Connection(name, ajaxUrl, socketUrl) {
+function Connection(name, ajaxEndPoint, socketEndPoint, path) {
 	this.name = name;
-	this.ajaxUrl = ajaxUrl;
-	this.socketUrl = socketUrl;
+	this.ajaxEndPoint = ajaxEndPoint;
+	this.socketEndPoint = socketEndPoint;
+	this.path = path;
+	this.ajaxUrl = ajaxEndPoint + path;
+	this.socketUrl = socketEndPoint + path;
 	this.conn = null;
 }
 

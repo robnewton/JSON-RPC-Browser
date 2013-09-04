@@ -1,0 +1,53 @@
+
+  #connection-panel {
+    /*display: none;*/
+    z-index: 502;
+  }
+
+  .fixed {
+    position: fixed;
+    top: 60px;
+    width: 360px;
+    z-index: 100;
+  }
+
+  #wrap.scrollable {
+    bottom: 60px;
+    overflow-y: scroll;
+    overflow-x: hidden;
+  }
+
+  #methods-sidebar {
+    padding-top: 20px;
+    z-index: 501;
+  }
+
+  .method-title.affix {
+    top: 50px;
+    height: 150px;
+    background-color: #fff;
+    width: 100%;
+    z-index: 500;
+  }
+
+  .method-tab-row.affix {
+    top: 160px;
+    background-color: #fff;
+    width: 100%;
+    z-index: 501;
+  }
+
+  #app-container {
+    margin-top:160px;
+  }
+
+  .fuelux.well {
+    padding: 0px;
+    margin-bottom:0px;
+  }
+
+  /* Button mods
+  -------------------------------------------------- */
+  .btn-xs {
+    padding: 1px 5px;
+  }

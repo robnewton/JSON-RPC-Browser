@@ -1,0 +1,24 @@
+
+
+  /* Skinny div scrollbars
+  -------------------------------------------------- */
+  html {height: 101%;}
+  #body{}
+  ::-webkit-scrollbar {
+    width: 3px;
+    height: 3px;
+  }
+  ::-webkit-scrollbar-track-piece {
+    background-color: #ffffff;
+    -webkit-border-radius: 3px;
+  }
+  ::-webkit-scrollbar-thumb:vertical {
+    height: 10px;
+    background-color: #aaa;
+    -webkit-border-radius: 3px;
+  }
+  ::-webkit-scrollbar-thumb:horizontal {
+    width: 5px;
+    background-color: #aaa;
+    -webkit-border-radius: 3px;
+  }

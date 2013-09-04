@@ -19,9 +19,7 @@ function traverseObjectTree(level,o,func) {
 	for (var i in o) {
 		if (func.apply(this,[level,i,o])) {
 			//Reprocess incase of changes to the object
-			if (typeof(o[i])=="object") {
-				traverseObjectTree(level,o,func);
-			}
+			traverseObjectTree(level,o,func);
 		}
 		if (typeof(o[i])=="object") {
 			level++;
@@ -41,7 +39,7 @@ function processObject(level,i,o) {
 	}
 	if (i === 'type') {
 		if (o[i] === 'object') {
-			logIndented(level, "Found object that needs to be traversed for references {'" + i + "' : "+o[i] + "}");
+			//logIndented(level, "Found object that needs to be traversed for references {'" + i + "' : "+o[i] + "}");
 		}
 	}
 	return processedSomething;

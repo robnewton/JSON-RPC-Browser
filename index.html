@@ -7,11 +7,11 @@
 	<meta name="description" content="">
 	<meta name="author" content="">
 
-	<title>JSON-RPC Browser - v0.6</title>
+	<title>JSON-RPC Browser - v0.7</title>
 
 	<!-- Bootstrap core CSS -->
 	<link href="css/bootstrap.css" rel="stylesheet">
-	<!--
+	<!-- Theme Tests
 	<link href="css/themes/bootstrap-amelia.css" rel="stylesheet">
 	<link href="css/themes/bootstrap-cerulean.css" rel="stylesheet">
 	<link href="css/themes/bootstrap-cosmo.css" rel="stylesheet">
@@ -29,148 +29,11 @@
 	<link href="css/bootstrap-switch.css" rel="stylesheet">
 	<link href="css/bootstrap-slider.css" rel="stylesheet">
 	<link href="css/flat-ui-fonts.css" rel="stylesheet">
-	<link href="css/prettyCheckable.css" rel="stylesheet">
+	<link href="css/prettyCheckable/prettyCheckable.css" rel="stylesheet">
 	<link href="css/fuelux.css" rel="stylesheet">
-
-	<style type="text/css">
-	#connection-panel {
-		display: none;
-	}
-
-	.fixed {
-		position: fixed;
-		top: 60px;
-		width: 360px;
-		z-index: 100;
-	}
-
-	#wrap.scrollable {
-		bottom: 60px;
-		overflow-y: scroll;
-		overflow-x: hidden;
-	}
-
-	#methods-sidebar {
-		padding-top: 20px;
-		z-index: 501;
-	}
-
-	.method-title.affix {
-		top: 50px;
-		background-color: #fff;
-		width: 100%;
-		z-index: 500;
-	}
-
-	#app-container {
-		margin-top:80px;
-	}
-
-	.fuelux.well {
-		padding: 0px;
-		margin-bottom:0px;
-	}
-
-	/* Button mods
-	-------------------------------------------------- */
-	.btn-xs {
-		padding: 1px 5px;
-	}
-
-	/* Docs sidebar
-	-------------------------------------------------- */
-
-	.bs-sidebar.affix {
-		position: fixed;
-		top: 158px;
-		bottom: 60px;
-		width: 360px;
-		overflow-y: scroll;
-		overflow-x: hidden;
-	}
-
-	.bs-sidebar.affix-bottom {
-		position: absolute; /* Undo the static from mobile-first approach */
-	}
-
-	.bs-sidebar.affix-bottom .bs-sidenav,
-	.bs-sidebar.affix .bs-sidenav {
-		margin-top: 0;
-		margin-bottom: 0;
-	}
-
-	.bs-header h1,
-	.bs-header p {
-		margin-right: 380px;
-	}
-
-	/* First level of nav */
-	.bs-sidenav {
-		margin-top: 30px;
-		margin-bottom: 30px;
-		padding-top:    10px;
-		padding-bottom: 10px;
-		text-shadow: 0 1px 0 #fff;
-		background-color: #f7f5fa;
-		border-radius: 5px;
-	}
-
-	/* All levels of nav */
-	.bs-sidebar .nav > li > a {
-		display: block;
-		color: #428bca;
-		padding: 5px 20px;
-	}
-	.bs-sidebar .nav > li > a:hover,
-	.bs-sidebar .nav > li > a:focus {
-		text-decoration: none;
-		background-color: #e5e3e9;
-	}
-	.bs-sidebar .nav > .active > a,
-	.bs-sidebar .nav > .active:hover > a,
-	.bs-sidebar .nav > .active:focus > a {
-		font-weight: bold;
-		color: #428bca;
-		background-color: transparent;
-		border-left: 1px solid #428bca;
-	}
-
-	/* Nav: second level (shown on .active) */
-	.bs-sidebar .nav .nav {
-		display: none; /* Hide by default, but at >768px, show it */
-		margin-bottom: 8px;
-	}
-	.bs-sidebar .nav .nav > li > a {
-		padding-top:    3px;
-		padding-bottom: 3px;
-		padding-left: 30px;
-		font-size: 90%;
-	}
-
-	/* Skinny div scrollbars
-	-------------------------------------------------- */
-	html {height: 101%;}
-	#body{}
-	::-webkit-scrollbar {
-		width: 3px;
-		height: 3px;
-	}
-	::-webkit-scrollbar-track-piece {
-		background-color: #ffffff;
-		-webkit-border-radius: 3px;
-	}
-	::-webkit-scrollbar-thumb:vertical {
-		height: 10px;
-		background-color: #aaa;
-		-webkit-border-radius: 3px;
-	}
-	::-webkit-scrollbar-thumb:horizontal {
-		width: 5px;
-		background-color: #aaa;
-		-webkit-border-radius: 3px;
-	}
-
-	</style>
+	<link href="css/bootstrap-sidebar.css" rel="stylesheet">
+	<link href="css/skinnyGrayScrollBars.css" rel="stylesheet">
+	<link href="css/main.css" rel="stylesheet">
 </head>
 
 <body>
@@ -186,7 +49,7 @@
 					<span class="icon-bar"></span>
 					<span class="icon-bar"></span>
 				</button>
-				<a class="navbar-brand" href="#">JSON-RPC Browser - v0.4</a>
+				<a class="navbar-brand" href="#">JSON-RPC Browser - v0.7</a>
 				<div class="nav-collapse collapse">
 					<ul class="nav navbar-nav">
 						<li class="dropdown">
@@ -222,12 +85,16 @@
 									<input type="text" class="form-control" id="name" placeholder="Name" value="Name Here">
 								</div>
 								<div class="form-group">
-									<label for="ajaxUrl">Ajax Url</label>
-									<input type="text" class="form-control" id="ajaxUrl" placeholder="/jsonrpc" value="/jsonrpc">
+									<label for="ajaxUrl">Ajax End Point</label>
+									<input type="text" class="form-control" id="ajaxEndPoint" placeholder="http://localhost:8152" value="http://localhost:8152">
 								</div>
 								<div class="form-group">
-									<label for="socketUrl">Web Sockets Url</label>
-									<input type="text" class="form-control" id="socketUrl" placeholder="ws://localhost:9090/jsonrpc" value="ws://localhost:9090/jsonrpc">
+									<label for="socketEndPoint">Web Sockets End Point</label>
+									<input type="text" class="form-control" id="socketEndPoint" placeholder="ws://localhost:9090" value="ws://localhost:9090">
+								</div>
+								<div class="form-group">
+									<label for="path">Path</label>
+									<input type="text" class="form-control" id="path" placeholder="/jsonrpc" value="/jsonrpc">
 								</div>
 								<button type="submit" onclick="Renderer.loadSourceFromNewForm();return false;" class="btn btn-default">Submit</button>
 								<button onclick="$('#'+Renderer.connectionPanelId).hide();return false;" class="btn btn-default">Cancel</button>
@@ -238,24 +105,45 @@
 
 			</div>
 
-			<div class="method-title affix">
-				<h2 id="method-name">Name</h2>
-				<p id="method-desc">Desc</p>
+			<div class="method-title affix row">
+				<!-- Selected method detail -->
+				<div class="col-lg-5">
+					<h2 id="method-name"></h2>
+					<p id="method-desc" height="100px">Choose a method from the list on the right.</p>
+				</div>
 			</div>
-			<hr>
+			<div class="method-tab-row affix row">
+				<div class="col-lg-5">
+					<ul id="tabs" class="nav nav-tabs" data-tabs="tabs">
+						<li><a href="#try" data-toggle="tab">Try It</a></li>
+						<li><a href="#details" data-toggle="tab">Parameters</a></li>
+						<li><a href="#schema" data-toggle="tab">Schema</a></li>
+						<li><a href="#python" data-toggle="tab">Python</a></li>
+						<li><a href="#history" data-toggle="tab">History</a></li>
+					</ul>
+				</div>
+			</div>
 
 			<div class="row" id="app-container">
-				<!-- Selected method detail -->
 				<div class="col-lg-8">
-					<div class="row">
-						<ul id="tabs" class="nav nav-pills" data-tabs="tabs">
-							<li><a href="#details" data-toggle="tab">Parameters</a></li>
-							<li><a href="#schema" data-toggle="tab">Schema</a></li>
-							<li><a href="#python" data-toggle="tab">Python</a></li>
-							<li class="active"><a href="#try" data-toggle="tab">Try It</a></li>
-						</ul>
-					</div>
 					<div id="my-tab-content" class="tab-content">
+						<div class="tab-pane" id="try">
+							<p></p>
+							<p>The form below is auto generated based upon the API introspection. Type some values and get a response!</p>
+							<pre class="pre-scrollable" id="tryit-response" hidden="true"> </pre>
+							<p></p>
+							<form class="form-horizontal" id="tryit-form">
+								<div class="panel panel-default  clearfix">
+									<div class="panel-heading">Required<button type="submit" class="btn btn-primary  btn-xs pull-right">Call Method</button></div>
+									<fieldset id="tryit-form-required"><div class="form-group"></div></fieldset>
+								</div>
+								<div class="panel panel-default clearfix">
+									<div class="panel-heading">Optional<button type="submit" class="btn btn-primary  btn-xs pull-right">Call Method</button></div>
+									<fieldset id="tryit-form-optional"><div class="form-group"></div></fieldset>
+									<div class="panel-footer">Optional<button type="submit" class="btn btn-primary  btn-xs pull-right">Call Method</button></div>
+								</div>
+							</form>
+						</div>
 						<div class="tab-pane" id="details">
 							<p></p>
 							<table class="table table-hover" id="params-table">
@@ -277,59 +165,16 @@
 						</div>
 						<div class="tab-pane" id="python">
 							<p></p>
-							<pre class="pre-scrollable" id="python-code">import json
-from json import JSONEncoder
-import time
-import hashlib
-import http.client
-
-endpoint = "http://localhost:8152"
-path = "/jsonrpc"
-
-if __name__ == "__main__":
-    
-    #Make an http connection object pointed at the endpoint
-    conn = http.client.HTTPConnection(endpoint)
-    
-    #This the generated JSON-RPC query code
-    paramsForKeys = JSONEncoder().encode({"jsonrpc": "2.0", "method": "VideoLibrary.GetMovies", "params": { "filter": {"field": "playcount", "operator": "is", "value": "0"}, "limits": { "start" : 0, "end": 75 }, "properties" : ["art", "rating", "thumbnail", "playcount", "file"], "sort": { "order": "ascending", "method": "label", "ignorearticle": true } }, "id": 1})
-    
-    #Headers
-    headers = {"Content-type": "application/json", "Accept": "text/plain", "Content-length": repr(len(params))}
-    
-    #Send it
-    conn.request("POST", path, params, headers)
-    
-    resp = conn.getresponse()    
-    
-    #Response data is a binary string and I want to read it easily
-    responseObject = resp.read().decode()
-    
-    #Doing a little pretty formating to get it to look nice on my output terminal
-    print(json.dumps(json.loads(responseObject), sort_keys=True, indent=4))
-    
-    #Just being safe here
-    conn.close()
-    
-
-							</pre>
+							<pre class="pre-scrollable" id="python-code"></pre>
 						</div>
-						<div class="tab-pane active" id="try">
+						<div class="tab-pane" id="history">
 							<p></p>
-							<p>The form below is auto generated based upon the api introspection. Type some values and get a response!</p>
-							<pre class="pre-scrollable" id="tryit-response" hidden="true"> </pre>
 							<p></p>
-							<form class="form-horizontal" id="tryit-form">
-								<div class="panel panel-default  clearfix">
-									<div class="panel-heading">Required<button type="submit" class="btn btn-primary  btn-xs pull-right">Call Method</button></div>
-									<fieldset id="tryit-form-required"><div class="form-group"></div></fieldset>
-								</div>
-								<div class="panel panel-default clearfix">
-									<div class="panel-heading">Optional<button type="submit" class="btn btn-primary  btn-xs pull-right">Call Method</button></div>
-									<fieldset id="tryit-form-optional"><div class="form-group"></div></fieldset>
-									<div class="panel-footer">Optional<button type="submit" class="btn btn-primary  btn-xs pull-right">Call Method</button></div>
-								</div>
-							</form>
+							<p></p>
+							<button class="btn btn-primary" type="button" onclick="$('#history-body').html('');">Clear</button>
+							<p></p>
+							<div class="tab-pane" id="history-body">
+							</div>
 						</div>
 					</div>
 				</div>
@@ -345,13 +190,6 @@ if __name__ == "__main__":
 							</span>
 						</div><!-- /input-group -->
 					</div>
-					<!-- <div class="span3 bs-docs-sidebar">
-						<div class="nav nav-list bs-docs-sidenav affix" style="top: 200px;" id="methods">
-
-						</div>
-						<ul class="nav nav-list bs-docs-sidenav affix" id="methods">
-						</ul>
-					</div> -->
 					<div class="bs-sidebar affix">
 						<ul class="nav bs-sidenav" id="methods">
 						</ul>
@@ -380,6 +218,8 @@ if __name__ == "__main__":
 	<script src="js/vendor/fuelux/require.js"></script>
 	<script src="js/vendor/fuelux/loader.min.js"></script>
 	<script src="js/vendor/fuelux/all.min.js"></script>
+	<script src="js/vendor/timestamp.js"></script>
+	<script src="js/vendor/freemarker.js"></script>
 
 	<script src="js/jsonrpc.formbuilder.js"></script>
 	<script src="js/jsonrpc.schemahelper.js"></script>

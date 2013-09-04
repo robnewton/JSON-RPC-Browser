@@ -20,8 +20,9 @@ Renderer.init = function() {
 Renderer.loadSourceFromNewForm = function() {
 	ConnectionHelper.openConnection = new Connection(
 		$('#name').val(), 
-		$('#ajaxUrl').val(), 
-		$('#socketUrl').val()
+		$('#ajaxEndPoint').val(), 
+		$('#socketEndPoint').val(),
+		$('#path').val()
 	);
 	Renderer.loadSource();
 	$('#'+Renderer.connectionPanelId).hide();
@@ -39,16 +40,13 @@ Renderer.loadSourceByRecentIndex = function(recentConnIndex) {
 Renderer.loadSource = function() {
 	ConnectionHelper.openConnection.connect();
 	ConnectionHelper.openConnection.introspect(function(result){
-		console.log(result);
+		//console.log(result);
 		SchemaHelper.init(result);
 		$('#'+Renderer.connectionDisplay).html(SchemaHelper.schema.description);
 
 		//Enrich the schema for easier processing
 		for (var key in result.methods) {
-			if (key == 'AudioLibrary.GetAlbums') {
-				console.log(key);
-			}
-			console.log(key);
+			//console.log(key);
 			result.methods[key].name = key;
 			SchemaHelper.normalizeTypes(result.methods[key].params);
 		}
@@ -59,15 +57,36 @@ Renderer.loadSource = function() {
 }
 
 Renderer.showResponse = function(result) {
+	Renderer.appendToCallHistory();
+	Renderer.generatePythonCode();
 	$('#'+Renderer.tryitResponseId).text(JSON.stringify(result, null, 4));
 	$('#'+Renderer.tryitResponseId).show();
-	console.log(result);
+	//console.log(result);
 }
 
 Renderer.showError = function(message, details) {
 	console.log(message);
 	$('#'+Renderer.tryitResponseId).text(details);
 	$('#'+Renderer.tryitResponseId).show();
+}
+
+Renderer.appendToCallHistory = function() {
+	var url = ConnectionHelper.openConnection.ajaxUrl + '?request='+JSON.stringify(ConnectionHelper.openConnection.conn.getPriorRequest());
+	var now = new Date().getTime();
+	var timestamp = timeStamp();
+	$('#history-body').prepend(''+
+		'<div class="alert alert-info alert-dismissable">'+
+		'	<button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>'+
+		'	<strong style="cursor: pointer;" data-toggle="collapse" data-target=".history-item-'+now+'">'+ConnectionHelper.openConnection.conn.getPriorRequest().method+'</strong><span class="caret"></span> <small class="history-item-'+now+'">'+timestamp+'</small>'+
+		'	<div class="collapse history-item-'+now+'">'+
+		'		<br>'+
+		'		<pre>'+url+'</pre>'+
+		'		<small>'+timestamp+'</small>'+
+		'		<a href=\''+url+'\' target="_blank" class="alert-link pull-right">'+
+		'			<small>Open in a New Tab</small>'+
+		'		</a><br>'+
+		'	</div>'+
+		'</div>');
 }
 
 Renderer.filterMethods = function(element, what) {
@@ -88,15 +107,21 @@ Renderer.methodHeaderClickHandler = function() {
 }
 
 Renderer.methodItemClickHandler = function() {
-	var header = $(this).parent().parent().parent().find(".method-list-header").text();
-	Renderer.loadMethod(header + '.' + $(this).text());
+	if (methodListIsCategorized) {
+		var header = $(this).parent().parent().parent().find(".method-list-header").text();
+		Renderer.loadMethod(header + '.' + $(this).text());
+	}else{
+		Renderer.loadMethod($(this).text());
+	}
 }
 
 var lastNamespace = '';
+var methodListIsCategorized = false;
 
 Renderer.refreshMethods = function(categorized) {
 	if (typeof categorized === "undefined" || categorized===null) categorized = true;
 
+    methodListIsCategorized = categorized;
 	$(".method-list-item").off();
 	$("#"+Renderer.methodListElementId).html('');
 	for (var method in SchemaHelper.schema.methods) {
@@ -124,8 +149,11 @@ Renderer.updateMethodCountBadge = function(count) {
 
 Renderer.loadMethod = function(methodName) {
 	Renderer.loadedMethod = SchemaHelper.schema.methods[methodName];
+
 	if (Renderer.loadedMethod === undefined){return;}
+
 	var method = Renderer.loadedMethod;
+	$('#tabs a[href="#try"]').tab('show');
 
 	//Render the details tab
 	$("#"+Renderer.parametersTableId).find("tr:gt(0)").remove();
@@ -137,15 +165,10 @@ Renderer.loadMethod = function(methodName) {
 
 	//Render the python tab
 	//$("#python").text('');
+	Renderer.generatePythonCode();
 	
 	//Render the try it tab
-	//$('#'+Renderer.tryitFormId).find('fieldset').remove();
-	//$('#'+Renderer.tryitFormId).find('button').remove();
-	//$('#'+Renderer.tryitFormId).append('<fieldset id="tryit-form-required"><legend>Required</legend><div class="form-group"></div></fieldset>');
-	//$('#'+Renderer.tryitFormId).append('<fieldset id="tryit-form-optional"><legend>Optional</legend><div class="form-group"></div></fieldset>');
 	$('#'+Renderer.tryitFormId).find('div.form-group').html('');
-	//$('#'+Renderer.tryitFormId).prepend('<button type="submit" class="btn btn-primary  btn-xs">Submit</button><p></p>');
-	//$('#'+Renderer.tryitFormId).append('<button type="submit" class="btn btn-primary  btn-xs">Submit</button><p></p><p></p>');
 
 	//Render the parameters table in the details tab
 	for (var i = 0; i < method.params.length; i++) {
@@ -157,6 +180,29 @@ Renderer.loadMethod = function(methodName) {
 
 	//Render the form
 	FormBuilder.buildForm(method);
+}
+
+Renderer.generatePythonCode = function() {
+    $.ajax({
+      type     : 'GET',
+      url      : 'ftl/python-simple.ftl',
+      cache    : false,
+
+      success  : function(data) {
+        $("#python-code").text(freemarker.render(data, {endpoint: ConnectionHelper.openConnection.ajaxEndPoint, path: ConnectionHelper.openConnection.path, jsonrpcrequest:  JSON.stringify(ConnectionHelper.openConnection.conn.getPriorRequest())}));
+      },
+
+      // JSON-RPC Server could return non-200 on error
+      error    : function(jqXHR, textStatus, errorThrown) {
+        try {
+          if ('console' in window) console.log(jqXHR.responseText);
+          if ('console' in window) console.log(response.error);
+        }
+        catch (err) {
+          console.log(jqXHR.responseText);
+        }
+      }
+    });
 }
 
 Renderer.initNavMenu = function() {

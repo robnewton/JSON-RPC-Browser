@@ -1,0 +1,71 @@
+
+
+  /* Docs sidebar
+  -------------------------------------------------- */
+
+  .bs-sidebar.affix {
+    position: fixed;
+    top: 158px;
+    bottom: 60px;
+    width: 360px;
+    overflow-y: scroll;
+    overflow-x: hidden;
+  }
+
+  .bs-sidebar.affix-bottom {
+    position: absolute; /* Undo the static from mobile-first approach */
+  }
+
+  .bs-sidebar.affix-bottom .bs-sidenav,
+  .bs-sidebar.affix .bs-sidenav {
+    margin-top: 0;
+    margin-bottom: 0;
+  }
+
+  .bs-header h1,
+  .bs-header p {
+    margin-right: 380px;
+  }
+
+  /* First level of nav */
+  .bs-sidenav {
+    margin-top: 30px;
+    margin-bottom: 30px;
+    padding-top:    10px;
+    padding-bottom: 10px;
+    text-shadow: 0 1px 0 #fff;
+    background-color: #f7f5fa;
+    border-radius: 5px;
+  }
+
+  /* All levels of nav */
+  .bs-sidebar .nav > li > a {
+    display: block;
+    color: #428bca;
+    padding: 5px 20px;
+  }
+  .bs-sidebar .nav > li > a:hover,
+  .bs-sidebar .nav > li > a:focus {
+    text-decoration: none;
+    background-color: #e5e3e9;
+  }
+  .bs-sidebar .nav > .active > a,
+  .bs-sidebar .nav > .active:hover > a,
+  .bs-sidebar .nav > .active:focus > a {
+    font-weight: bold;
+    color: #428bca;
+    background-color: transparent;
+    border-left: 1px solid #428bca;
+  }
+
+  /* Nav: second level (shown on .active) */
+  .bs-sidebar .nav .nav {
+    display: none; /* Hide by default, but at >768px, show it */
+    margin-bottom: 8px;
+  }
+  .bs-sidebar .nav .nav > li > a {
+    padding-top:    3px;
+    padding-bottom: 3px;
+    padding-left: 30px;
+    font-size: 90%;
+  }

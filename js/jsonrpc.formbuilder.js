@@ -73,7 +73,7 @@ FormBuilder.handleFormSubmit = function(){
 			}
 		}
 	}
-	console.log(params);
+	//console.log(JSON.stringify(params));
 	ConnectionHelper.openConnection.call(
 		Renderer.loadedMethod.name,
 		params,
@@ -105,26 +105,42 @@ FormBuilder.getMultitypeInputValue = function(param, id) {
 	}
 }
 
-FormBuilder.autoGetInputValue = function(typeDef, id) {
+FormBuilder.autoGetInputValue = function(param, id) {
 	if (typeof id === "undefined" || id===null) id = "";
 
-	switch (typeDef.type) {
-		case "boolean":
-			return ($("[name='"+id+"-switch']").val()=="true");
-			break;
-		case "integer":
-			return parseInt($('#'+id).val());
-			break;
-		case "array":
-			return FormBuilder.getPillBoxPills(id);
-			break;
-		case "string":
-			if ($.isArray(typeDef.enums)) {
-				return $('#'+id).val();
-			}else{
-				return $('#'+id).val();
-			}
-			break;
+	if (typeof param.type !== "undefined") {
+		switch (param.type) {
+			case "boolean":
+				return ($("[name='"+id+"-switch']:checked").val()==="true");
+				break;
+			case "integer":
+				return parseInt($('#'+id).val());
+				break;
+			case "array":
+				return FormBuilder.getPillBoxPills(id);
+				break;
+			case "string":
+				if ($.isArray(param.enums)) {
+					return $('#'+id).val();
+				}else{
+					return $('#'+id).val();
+				}
+				break;
+			case "object":
+				if (typeof param.properties != 'undefined') {
+					var obj = {};
+					for (var prop in param.properties) {
+						obj[prop] = FormBuilder.autoGetInputValue(param.properties[prop], id + '-obj-' + prop);
+					}
+					return obj;
+				}
+				break;
+		}
+	}else{
+		//There is no type, so check for the "items" array
+		if (typeof param.items != 'undefined') {
+			return FormBuilder.autoGetInputValue(param.items, id);
+		}
 	}
 }
 
@@ -202,14 +218,7 @@ FormBuilder.autoBuildInput = function(target, param, id) {
 		if ($.isArray(param.type)) {
 			FormBuilder.buildMultitypeInput(target, param, id);
 		}else{
-			if (typeof param.type != 'undefined') {
-				FormBuilder.autoBuildInputElement(target, param, id);
-			}else{
-				//There is no type, so check for the "items" array
-				if (typeof param.items != 'undefined') {
-					//TODO: What is the type if param.type doesn't exist?
-				}
-			}
+			FormBuilder.autoBuildInputElement(target, param, id);
 		}
 	}
 }
@@ -223,40 +232,58 @@ FormBuilder.buildMultitypeInput = function(target, param, id) {
 			target.append('<div class="panel panel-default clearfix '+id+'-panel" id="'+id+'-type'+key+'-panel"><fieldset class="col-lg-11 '+id+'-type-fieldset" id="'+id+'-type'+key+'-fieldset"></fieldset><button type="button" class="btn btn-primary btn-xs col-lg-1 tryit-type-picker '+id+'-picker" id="'+id+'-type'+key+'-picker">Pick</button></div>');
 			FormBuilder.autoBuildInputElement($('#'+id+'-type'+key+'-fieldset'), param.type[key], id+'-type'+key+'-input');
 		}
-		//Default the selected type to the first on ein the list
+		//Default the selected type to the first one in the list
 		FormBuilder.handleTypePickerClick(id+'-type0-picker');
 	}else{
 		console.log('Not a multitype parameter');
 	}
 }
 
-FormBuilder.autoBuildInputElement = function(target, typeDef, id) {
+FormBuilder.autoBuildInputElement = function(target, param, id) {
 	if (typeof id === "undefined" || id===null) id = "";
 
-	switch (typeDef.type) {
-		case "boolean":
-			FormBuilder.buildBooleanInput(target, typeDef, id);
-			break;
-		case "integer":
-			FormBuilder.buildIntegerInput(target, typeDef, id);
-			break;
-		case "array":
-			FormBuilder.buildArrayInput(target, typeDef, id);
-			break;
-		case "string":
-			if ($.isArray(typeDef.enums)) {
-				FormBuilder.buildEnumInput(target, typeDef, id);
-			}else{
-				FormBuilder.buildTextInput(target, typeDef, id);
-			}
-			break;
+	if (typeof param.type !== "undefined") {
+		switch (param.type) {
+			case "boolean":
+				FormBuilder.buildBooleanInput(target, param, id);
+				break;
+			case "integer":
+				FormBuilder.buildIntegerInput(target, param, id);
+				break;
+			case "array":
+				FormBuilder.buildArrayInput(target, param, id);
+				break;
+			case "string":
+				if ($.isArray(param.enums)) {
+					FormBuilder.buildEnumInput(target, param, id);
+				}else{
+					FormBuilder.buildTextInput(target, param, id);
+				}
+				break;
+			case "object":
+				if (typeof param.properties != 'undefined') {
+					for (var prop in param.properties) {
+						target.append('<label class="control-label">' + prop + '</label><br>');
+						target.append('<div class="panel panel-primary clearfix"></div>');
+						FormBuilder.autoBuildInput(target.find('div:last'), param.properties[prop], id + '-obj-' + prop);
+					}
+				}
+		}
+	}else{
+		//target.append('Param type unknown.');
+		//There is no type, so check for the "items" array
+		if (typeof param.items != 'undefined') {
+			//TODO: What is the type if param.type doesn't exist?
+			//target.append('Custom object with items element.');
+			FormBuilder.autoBuildInputElement(target, param.items, id);
+		}
 	}
 }
 
-FormBuilder.buildArrayInput = function(target, typeDef, id) {
+FormBuilder.buildArrayInput = function(target, param, id) {
 	if (typeof id === "undefined" || id===null) id = "";
 	
-	if (typeDef.type=='array') {
+	if (param.type=='array') {
 		var arrayInput = '';
 		arrayInput += '' +
 			'<div class="input-group">'+
@@ -267,15 +294,15 @@ FormBuilder.buildArrayInput = function(target, typeDef, id) {
 						'<span class="caret"></span>'+
 					'</button>'+
 					'<ul class="dropdown-menu" id="'+id+'-dropdown">';
-						for (var i = 0; i < typeDef.items.enums.length; i++) {
-							arrayInput += '<li><a href="#" onclick="$(\'#'+id+'-input\').val(this.text)">'+typeDef.items.enums[i]+'</a></li>';
+						for (var i = 0; i < param.items.enums.length; i++) {
+							arrayInput += '<li><a href="#" onclick="$(\'#'+id+'-input\').val(this.text)">'+param.items.enums[i]+'</a></li>';
 						};
 						arrayInput += '' +
 					'</ul>'+
 				'</div>'+
 			'</div><br>'+
 			'<div class="well fuelux" style="">'+
-				'<div id="'+id+'" class="pillbox'+((typeDef.uniqueItems)?' unique':'')+'">'+
+				'<div id="'+id+'" class="pillbox'+((param.uniqueItems)?' unique':'')+'">'+
 					'<ul>'+
 					'</ul>'+
 				'</div>'+
@@ -287,11 +314,11 @@ FormBuilder.buildArrayInput = function(target, typeDef, id) {
 	}
 }
 
-FormBuilder.buildTextInput = function(target, typeDef, id, placeholder) {
+FormBuilder.buildTextInput = function(target, param, id, placeholder) {
 	if (typeof id === "undefined" || id===null) id = "";
 	if (typeof placeholder === "undefined" || placeholder===null) placeholder = "";
 	
-	if (typeDef.type=='string') {
+	if (param.type=='string') {
 		var textInput = '';
 		textInput += '<input type="text" class="form-control" id="'+id+'" placeholder="'+placeholder+'">';
 		target.append(textInput);
@@ -300,18 +327,18 @@ FormBuilder.buildTextInput = function(target, typeDef, id, placeholder) {
 	}
 }
 
-FormBuilder.buildIntegerInput = function(target, typeDef, id) {
+FormBuilder.buildIntegerInput = function(target, param, id) {
 	if (typeof id === "undefined" || id===null) id = "";
 	
-	if (typeDef.type=='integer') {
+	if (param.type=='integer') {
 		var textInput = '';
-		textInput += '<input type="text" class="form-control" id="'+id+'" value="'+(typeDef.maximum != 'undefined' ? typeDef.default : '')+'">';
+		textInput += '<input type="text" class="form-control" id="'+id+'" value="'+(param.maximum != 'undefined' ? param.default : '')+'">';
 		target.append(textInput);
-		if (typeDef.maximum != 'undefined') {
-			if (typeDef.maximum > 0) {
+		if (param.maximum != 'undefined') {
+			if (param.maximum > 0) {
 				$('#'+id).slider({
-					min: typeDef.minimum,
-					max: typeDef.maximum
+					min: param.minimum,
+					max: param.maximum
 				});
 			}
 		}
@@ -320,12 +347,12 @@ FormBuilder.buildIntegerInput = function(target, typeDef, id) {
 	}
 }
 
-FormBuilder.buildEnumInput = function(target, typeDef, id) {
+FormBuilder.buildEnumInput = function(target, param, id) {
 	if (typeof id === "undefined" || id===null) id = "";
 	
-	if (($.isArray(typeDef.enums)) && (typeDef.type=='string')) {
+	if (($.isArray(param.enums)) && (param.type=='string')) {
 		var enumInput = '<select class="form-control" id="'+id+'">';
-		$.each(typeDef.enums, function(key, value) {
+		$.each(param.enums, function(key, value) {
 			enumInput += '<option>'+value+'</option>';
 		});
 		enumInput += '</select>';
@@ -335,10 +362,10 @@ FormBuilder.buildEnumInput = function(target, typeDef, id) {
 	}
 }
 
-FormBuilder.buildBooleanInput = function(target, typeDef, id) {
+FormBuilder.buildBooleanInput = function(target, param, id) {
 	if (typeof id === "undefined" || id===null) id = "";
 	
-	if (typeDef.type=='boolean') {
+	if (param.type=='boolean') {
 		var booleanInput = '';
 		//booleanInput += '<div class="make-switch" id="'+id+'-switch"><input type="checkbox" class="myClass" />Boolean</div>';
 		//booleanInput += '<input type="radio" class="myClass" value="1" id="'+id+'-switch" name="'+id+'-switch">';
