@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>JSONPI Example</title>
+        <script src="js/vendor/jquery-1.10.2.min.js"></script>
+        <script type="text/javascript" src="js/jquery.jsonpi.js"></script>
+    </head>
+
+    <body>
+        <h1>JSONPI Example</h1>
+
+        <p>This page initiates a JSONPI request using the bundled jQuery transport. Check the console for output.</p>
+
+        <!-- <iframe style="display:inline;border=1px;" name="test_iframe" id="test_iframe">
+            <form action="http://jsonviewer.net/index.php"
+            method="POST" target="jQuery_iframe_1234567890">
+        </iframe> -->
+
+
+        <script>
+            /*var name = 'test_iframe', iframe, form;
+
+            iframe = $('<iframe>')
+            .attr('name', name)
+            .appendTo('head')
+
+            form = $('<form id="test_iframe">')
+            .attr('method', 'POST') // GET or POST
+            .attr('action', 'http://jsonviewer.net/index.php')
+            .attr('target', name);
+
+            
+            $('<input>')
+            .attr('type', 'input')
+            .attr('name', 'taJSONString')
+            .attr('value', 'test')
+            .appendTo(form);
+
+            form.appendTo('body');//.submit();*/
+
+            $(function() {
+                $.ajax({
+                    url: 'http://jsonviewer.net/index.php',
+                    type: 'POST',
+                    dataType: 'jsonpi', // <---
+                    params: { 'taJSONString': '{"test":0}', btnSubmit:'Decode'},
+                    success: function(response) {
+                        console.log('Success');
+                        console.log(response);
+                    }
+                });
+            });
+        </script>
+    </body>
+
+</html>

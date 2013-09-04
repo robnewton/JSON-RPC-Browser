@@ -16,7 +16,7 @@ FormBuilder.buildForm = function() {
 	for (var i = 0; i < Renderer.loadedMethod.params.length; i++) {
 		var parameter = Renderer.loadedMethod.params[i];
 		var topFieldset = (parameter.required ? '#tryit-form-required' : '#tryit-form-optional');
-		$(topFieldset + ' div.form-group').append('<label class="col-lg-2 control-label tryit-optional-toggle" id="tryit-' + parameter.name + '-label" for="tryit-' + parameter.name + '-type1-input">' + parameter.name + '</label><div class="col-lg-10 panel panel-default clearfix" id="tryit-' + parameter.name + '-div"><fieldset id="tryit-' + parameter.name + '-fieldset" '+(parameter.required ? '' : 'disabled')+'></fieldset></div>');
+		$(topFieldset + ' div.form-group').append('<label class="col-lg-2 control-label tryit-optional-toggle" id="tryit-' + parameter.name + '-label" for="tryit-' + parameter.name + '-type1-input" title="' + (parameter.required ? parameter.name : 'Click here to enable the ' + parameter.name + ' optional parameter.') + '">' + parameter.name + '</label><div class="col-lg-10 panel panel-default clearfix" id="tryit-' + parameter.name + '-div"><fieldset id="tryit-' + parameter.name + '-fieldset" '+(parameter.required ? '' : 'disabled')+'></fieldset></div>');
 		//<br><div class="make-switch switch-mini tryit-optional-toggle" id="tryit-' + parameter.name + '-toggle" data-on-label="<i class=\'switch-mini-font-icons fui-check icon-white\'></i>" data-off-label="<i class=\'switch-mini-font-icons fui-cross\'></i>"><input type="checkbox" /></div>
 		//$('#tryit-' + parameter.name + '-label').append('<br><div class="make-switch switch-mini tryit-optional-toggle" id="tryit-' + parameter.name + '-toggle"><input type="checkbox" /></div>');
 		$('#tryit-' + parameter.name + '-toggle').bootstrapSwitch();
@@ -45,27 +45,84 @@ FormBuilder.buildForm = function() {
 		FormBuilder.handleBooleanToggle(this.id);
 	});
 
+	$('#'+Renderer.tryitFormId).off();
 	$('#'+Renderer.tryitFormId).submit(function() {
-        //console.log(JSON.stringify($('#tryit-form').serializeObject()));
-		var params = {};
+        return FormBuilder.handleFormSubmit();
+    });
+}
 
-		//Example of getting the value of the selected radio style button group
-		//var includeicon=$("[name='includeicon'].active").val();
+FormBuilder.handleFormSubmit = function(){
+    //console.log(JSON.stringify($('#tryit-form').serializeObject()));
 
-		for (var value in Renderer.loadedMethod.params) {
-			if (value.required == true) {
-				if ($('#'+Renderer.tryitFormId+'-'+value.name+'-input').val() == 'false') {
-					params[value.name] = false;
-				}
+	//Example of getting the value of the selected radio style button group
+	//var includeicon=$("[name='includeicon'].active").val();
+
+	var params = {};
+	for (var i = 0; i < Renderer.loadedMethod.params.length; i++) {
+		var parameter = Renderer.loadedMethod.params[i];
+		var id = 'tryit-'+parameter.name;
+		if (parameter.required == true) {
+			params[parameter.name] = FormBuilder.getParameterValue(parameter, id);
+		}else{
+			if (!$('#'+id+'-fieldset').prop('disabled')) {
+				params[parameter.name] = FormBuilder.getParameterValue(parameter, id);
 			}
 		}
-		ConnectionHelper.openConnection.call(
-			Renderer.loadedMethod.name,
-			params,
-			Renderer.showResponse
-		);
-        return false;
-    });
+	}
+	console.log(params);
+	ConnectionHelper.openConnection.call(
+		Renderer.loadedMethod.name,
+		params,
+		Renderer.showResponse
+	);
+    return false;
+}
+
+FormBuilder.getParameterValue = function(param, id) {
+	if (typeof id === "undefined" || id===null) id = "";
+	
+	if ($.isArray(param.type)) {
+		return FormBuilder.getMultitypeInputValue(param, id);
+	}else{
+		return FormBuilder.autoGetInputValue(param, id);
+	}
+}
+
+FormBuilder.getMultitypeInputValue = function(param, id) {
+	if (typeof id === "undefined" || id===null) id = "";
+	  
+	if ($.isArray(param.type)) {
+		for (var key = 0; key < param.type.length; key++) {
+			if (!$('#'+id+'-type'+key+'-fieldset').prop('disabled')) {
+				return FormBuilder.autoGetInputValue(param.type[key], id+'-type'+key+'-input');
+			}
+		}
+	}else{
+		console.log('Not a multitype parameter');
+	}
+}
+
+FormBuilder.autoGetInputValue = function(typeDef, id) {
+	if (typeof id === "undefined" || id===null) id = "";
+
+	switch (typeDef.type) {
+		case "boolean":
+			return ($("[name='"+id+"-switch']").val()=="true");
+			break;
+		case "integer":
+			return parseInt($('#'+id).val());
+			break;
+		case "array":
+			return $('#'+id).val().split(',');
+			break;
+		case "string":
+			if ($.isArray(typeDef.enums)) {
+				return $('#'+id).val();
+			}else{
+				return $('#'+id).val();
+			}
+			break;
+	}
 }
 
 FormBuilder.handleBooleanToggle = function(sender){
@@ -97,7 +154,6 @@ FormBuilder.handleTypePickerClick = function(sender){
  	var split = sender.split("-");
  	var base = split.slice(0, split.length - 2).join("-");
  	var baseType = split.slice(0, split.length - 1).join("-");
-	console.log('Type chosen: ' + sender);
 
 	//Loop through each fieldset and disable it
 	$("#tryit-form ."+base+"-type-fieldset").prop('disabled', true);
@@ -158,9 +214,9 @@ FormBuilder.autoBuildInputElement = function(target, typeDef, id) {
 			break;
 		case "string":
 			if ($.isArray(typeDef.enums)) {
-				FormBuilder.buildEnumInput(target, typeDef);
+				FormBuilder.buildEnumInput(target, typeDef, id);
 			}else{
-				FormBuilder.buildTextInput(target, typeDef);
+				FormBuilder.buildTextInput(target, typeDef, id);
 			}
 			break;
 	}
@@ -169,68 +225,80 @@ FormBuilder.autoBuildInputElement = function(target, typeDef, id) {
 FormBuilder.buildArrayInput = function(target, typeDef, id) {
 	if (typeof id === "undefined" || id===null) id = "";
 	
-	var arrayInput = '';
 	if (typeDef.type=='array') {
+		var arrayInput = '';
 		arrayInput += '<input type="text" class="form-control" id="'+id+'">';
-		//tagsToInit.push(id);
+		target.append(arrayInput);
+	}else{
+		console.log('Not an array parameter');
 	}
-	target.append(arrayInput);
 }
 
 FormBuilder.buildTextInput = function(target, typeDef, id, placeholder) {
 	if (typeof id === "undefined" || id===null) id = "";
 	if (typeof placeholder === "undefined" || placeholder===null) placeholder = "";
 	
-	var textInput = '';
 	if (typeDef.type=='string') {
+		var textInput = '';
 		textInput += '<input type="text" class="form-control" id="'+id+'" placeholder="'+placeholder+'">';
+		target.append(textInput);
+	}else{
+		console.log('Not a string parameter');
 	}
-	target.append(textInput);
 }
 
 FormBuilder.buildIntegerInput = function(target, typeDef, id) {
 	if (typeof id === "undefined" || id===null) id = "";
-	if (typeof placeholder === "undefined" || placeholder===null) placeholder = "";
 	
-	var textInput = '';
 	if (typeDef.type=='integer') {
-		textInput += '<input type="text" class="form-control" id="'+id+'-slider">';
+		var textInput = '';
+		textInput += '<input type="text" class="form-control" id="'+id+'" value="'+(typeDef.maximum != 'undefined' ? typeDef.default : '')+'">';
+		target.append(textInput);
+		if (typeDef.maximum != 'undefined') {
+			if (typeDef.maximum > 0) {
+				$('#'+id).slider({
+					min: typeDef.minimum,
+					max: typeDef.maximum
+				});
+			}
+		}
+	}else{
+		console.log('Not an integer parameter');
 	}
-	target.append(textInput);
-	$('#'+id+'-slider').slider({
-		min: typeDef.minimum,
-		max: typeDef.maximum
-	});
 }
 
 FormBuilder.buildEnumInput = function(target, typeDef, id) {
 	if (typeof id === "undefined" || id===null) id = "";
 	
-	var enumInput = '<select class="form-control" id="'+id+'">';
 	if (($.isArray(typeDef.enums)) && (typeDef.type=='string')) {
+		var enumInput = '<select class="form-control" id="'+id+'">';
 		$.each(typeDef.enums, function(key, value) {
 			enumInput += '<option>'+value+'</option>';
 		});
 		enumInput += '</select>';
+		target.append(enumInput);
+	}else{
+		console.log('Not a string enums parameter');
 	}
-	target.append(enumInput);
 }
 
 FormBuilder.buildBooleanInput = function(target, typeDef, id) {
 	if (typeof id === "undefined" || id===null) id = "";
 	
-	var booleanInput = '';
 	if (typeDef.type=='boolean') {
-		//booleanInput += '<div class="make-switch" id="'+id+'-switch"><input type="checkbox" class="myClass" /></div>';
+		var booleanInput = '';
+		//booleanInput += '<div class="make-switch" id="'+id+'-switch"><input type="checkbox" class="myClass" />Boolean</div>';
 		//booleanInput += '<input type="radio" class="myClass" value="1" id="'+id+'-switch" name="'+id+'-switch">';
-		//booleanInput += '<label class="radio-inline"><input class="myClass" type="radio" name="'+id+'-switch" id="'+id+'-switch-true" value="true" checked>True</label><label class="radio-inline"><input class="myClass" type="radio" name="'+id+'-switch" id="'+id+'-switch-false" value="false">False</label>';
-		booleanInput += ''+
+		booleanInput += '<label class="radio-inline"><input class="myClass" type="radio" name="'+id+'-switch" id="'+id+'-switch-true" value="true" checked>True</label><label class="radio-inline"><input class="myClass" type="radio" name="'+id+'-switch" id="'+id+'-switch-false" value="false">False</label>';
+		/*booleanInput += ''+
 		'<div class="btn-group" data-toggle="buttons">'+
 			'<label class="btn btn-success tryit-boolean-toggle active"><input type="radio" name="'+id+'-switch" id="'+id+'-switch-true"> <i class="icon-ok icon-white"></i></label>'+
 			'<label class="btn btn-danger tryit-boolean-toggle"><input type="radio" name="'+id+'-switch" id="'+id+'-switch-false"> False</label>'+
-		'</div>';
+		'</div>';*/
+		target.append(booleanInput);
+		$('input.myClass').prettyCheckable();
+		//$('#'+id+'-switch').bootstrapSwitch();
+	}else{
+		console.log('Not a boolean parameter');
 	}
-	target.append(booleanInput);
-	//$('input.myClass').prettyCheckable();
-	//$('#'+id+'-switch').bootstrapSwitch();
 }

@@ -254,9 +254,9 @@ if __name__ == "__main__":
 					<div class="panel panel-default clearfix" id="dropdowns">
 						<div class="panel-heading">Methods<span class="badge pull-right" id="method-count"></span></div>
 						<div class="input-group">
-							<input type="text" class="form-control" onkeyup="filterMethods(this,'methods')" >
+							<input type="text" class="form-control" onkeyup="filterMethods(this,'methods')" id="method-filter-input">
 							<span class="input-group-btn">
-								<button class="btn btn-default" type="button">Go!</button>
+								<button class="btn btn-default" type="button" onclick="$('#method-filter-input').val('');">Clear</button>
 							</span>
 						</div><!-- /input-group -->
 						<div class="list-group" id="methods">

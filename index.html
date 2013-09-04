@@ -24,13 +24,120 @@
 	#connection-panel {
 		display: none;
 	}
+
+	.fixed {
+		position: fixed;
+		top: 60px;
+		width: 360px;
+		z-index: 100;
+	}
+
+	#wrap.scrollable {
+		bottom: 60px;
+		overflow-y: scroll;
+		overflow-x: hidden;
+	}
+
+	/* Docs sidebar
+	-------------------------------------------------- */
+
+	.bs-sidebar.affix {
+		position: fixed;
+		top: 158px;
+		bottom: 60px;
+		width: 360px;
+		overflow-y: scroll;
+		overflow-x: hidden;
+	}
+
+	.bs-sidebar.affix-bottom {
+		position: absolute; /* Undo the static from mobile-first approach */
+	}
+
+	.bs-sidebar.affix-bottom .bs-sidenav,
+	.bs-sidebar.affix .bs-sidenav {
+		margin-top: 0;
+		margin-bottom: 0;
+	}
+
+	.bs-header h1,
+	.bs-header p {
+		margin-right: 380px;
+	}
+
+	/* First level of nav */
+	.bs-sidenav {
+		margin-top: 30px;
+		margin-bottom: 30px;
+		padding-top:    10px;
+		padding-bottom: 10px;
+		text-shadow: 0 1px 0 #fff;
+		background-color: #f7f5fa;
+		border-radius: 5px;
+	}
+
+	/* All levels of nav */
+	.bs-sidebar .nav > li > a {
+		display: block;
+		color: #428bca;
+		padding: 5px 20px;
+	}
+	.bs-sidebar .nav > li > a:hover,
+	.bs-sidebar .nav > li > a:focus {
+		text-decoration: none;
+		background-color: #e5e3e9;
+	}
+	.bs-sidebar .nav > .active > a,
+	.bs-sidebar .nav > .active:hover > a,
+	.bs-sidebar .nav > .active:focus > a {
+		font-weight: bold;
+		color: #428bca;
+		background-color: transparent;
+		border-left: 1px solid #428bca;
+	}
+
+	/* Nav: second level (shown on .active) */
+	.bs-sidebar .nav .nav {
+		display: none; /* Hide by default, but at >768px, show it */
+		margin-bottom: 8px;
+	}
+	.bs-sidebar .nav .nav > li > a {
+		padding-top:    3px;
+		padding-bottom: 3px;
+		padding-left: 30px;
+		font-size: 90%;
+	}
+
+	/* Skinny div scrollbars
+	-------------------------------------------------- */
+	html {height: 101%;}
+	#body{}
+	::-webkit-scrollbar {
+		width: 3px;
+		height: 3px;
+	}
+	::-webkit-scrollbar-track-piece {
+		background-color: #ffffff;
+		-webkit-border-radius: 3px;
+	}
+	::-webkit-scrollbar-thumb:vertical {
+		height: 10px;
+		background-color: #aaa;
+		-webkit-border-radius: 3px;
+	}
+	::-webkit-scrollbar-thumb:horizontal {
+		width: 5px;
+		background-color: #aaa;
+		-webkit-border-radius: 3px;
+	}
+
 	</style>
 </head>
 
 <body>
 
 	<!-- Wrap all page content here -->
-	<div id="wrap">
+	<div id="wrap" class="scrollable">
 
 		<!-- Fixed navbar -->
 		<div class="navbar navbar-fixed-top">
@@ -64,7 +171,7 @@
 			<div class="row" id="connection-panel">
 
 				<!-- Connection settings -->
-				<div class="col-lg-12">
+				<div class="col-lg-8">
 					<div class="panel panel-default clearfix">
 						<div class="panel-heading">Connection</div>
 						<p>Type the connection information in the form below.</p>
@@ -95,15 +202,17 @@
 			<div class="row">
 				<!-- Selected method detail -->
 				<div class="col-lg-8">
-					<h2 id="method-name">Name</h2>
-					<p id="method-desc">Desc</p>
-					<hr>
-					<ul id="tabs" class="nav nav-tabs" data-tabs="tabs">
-						<li><a href="#details" data-toggle="tab">Parameters</a></li>
-						<li><a href="#schema" data-toggle="tab">Schema</a></li>
-						<li><a href="#python" data-toggle="tab">Python</a></li>
-						<li class="active"><a href="#try" data-toggle="tab">Try It</a></li>
-					</ul>
+					<div class="row">
+						<h2 id="method-name">Name</h2>
+						<p id="method-desc">Desc</p>
+						<hr>
+						<ul id="tabs" class="nav nav-tabs" data-tabs="tabs">
+							<li><a href="#details" data-toggle="tab">Parameters</a></li>
+							<li><a href="#schema" data-toggle="tab">Schema</a></li>
+							<li><a href="#python" data-toggle="tab">Python</a></li>
+							<li class="active"><a href="#try" data-toggle="tab">Try It</a></li>
+						</ul>
+					</div>
 					<div id="my-tab-content" class="tab-content">
 						<div class="tab-pane" id="details">
 							<p></p>
@@ -122,11 +231,11 @@
 						</div>
 						<div class="tab-pane" id="schema">
 							<p></p>
-							<pre id="schema-json"></pre>
+							<pre class="pre-scrollable" id="schema-json"></pre>
 						</div>
 						<div class="tab-pane" id="python">
 							<p></p>
-							<pre id="python-code">import json
+							<pre class="pre-scrollable" id="python-code">import json
 from json import JSONEncoder
 import time
 import hashlib
@@ -166,26 +275,43 @@ if __name__ == "__main__":
 						<div class="tab-pane active" id="try">
 							<p></p>
 							<p>The form below is auto generated based upon the api introspection. Type some values and get a response!</p>
+							<pre class="pre-scrollable" id="tryit-response" hidden="true"> </pre>
+							<p></p>
 							<form class="form-horizontal" id="tryit-form">
+								<div class="panel panel-default clearfix">
+									<div class="panel-heading">Required<span class="badge pull-right">auto-generated</span></div>
+									<fieldset id="tryit-form-required"><div class="form-group"></div></fieldset>
+								</div>
+								<div class="panel panel-default clearfix">
+									<div class="panel-heading">Optional<span class="badge pull-right">auto-generated</span></div>
+									<fieldset id="tryit-form-optional"><div class="form-group"></div></fieldset>
+								</div>
 							</form>
-							<hr>
-							<pre id="tryit-response" hidden="true"> </pre>
 						</div>
 					</div>
 				</div>
 
 				<!-- Methods Column -->
 				<div class="col-lg-4">
-					<div class="panel panel-default clearfix" id="dropdowns">
+					<div class="panel panel-default clearfix fixed">
 						<div class="panel-heading">Methods<span class="badge pull-right" id="method-count"></span></div>
 						<div class="input-group">
-							<input type="text" class="form-control" onkeyup="filterMethods(this,'methods')" >
+							<input type="text" class="form-control" onkeyup="filterMethods(this,'methods')" id="method-filter-input">
 							<span class="input-group-btn">
-								<button class="btn btn-default" type="button">Go!</button>
+								<button class="btn btn-default" type="button" onclick="$('#method-filter-input').val('');Renderer.filterMethods(this,'methods');">Clear</button>
 							</span>
 						</div><!-- /input-group -->
-						<div class="list-group" id="methods">
+					</div>
+					<!-- <div class="span3 bs-docs-sidebar">
+						<div class="nav nav-list bs-docs-sidenav affix" style="top: 200px;" id="methods">
+
 						</div>
+						<ul class="nav nav-list bs-docs-sidenav affix" id="methods">
+						</ul>
+					</div> -->
+					<div class="bs-sidebar affix">
+						<ul class="nav bs-sidenav" id="methods">
+						</ul>
 					</div>
 				</div>
 
