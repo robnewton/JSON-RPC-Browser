@@ -66,45 +66,51 @@ Renderer.showError = function(message, details) {
 	$('#'+Renderer.tryitResponseId).show();
 }
 
-Renderer.filterMethods = function(element,what) {
+Renderer.filterMethods = function(element, what) {
     var value = $(element).val();
-    value = value.toLowerCase().replace(/\b[a-z]/g, function(letter) {
-        return letter.toUpperCase();
-    });
     if(value == '') {
-        $('#'+what+' > a').show();
-        $("#method-count").html($('#'+what+' > a').length);
+		Renderer.refreshMethods();
     }else{
-        $('#'+what+' > a:not(:contains(' + value + '))').hide();
-        $('#'+what+' > a:contains(' + value + ')').show();
-        $("#method-count").html($('#'+what+' > a:contains(' + value + ')').length);
+		Renderer.refreshMethods(false);
+        $('#'+what+' > li > a:not(:contains(' + value + '))').hide();
+        $('#'+what+' > li > a:contains(' + value + ')').show();
+        $("#method-count").html($('#'+what+' > li > a:contains(' + value + ')').length);
     }
 };
 
+Renderer.methodHeaderClickHandler = function() {
+	$(this).parent().parent().find("ul").hide();
+	$(this).parent().find("ul").show();
+}
 
-Renderer.methodClickHandler = function() {
-	Renderer.loadMethod($(this).text());
-	$('#methods li.active').removeClass();
-	$(this).parent().addClass('active');
+Renderer.methodItemClickHandler = function() {
+	var header = $(this).parent().parent().parent().find(".method-list-header").text();
+	Renderer.loadMethod(header + '.' + $(this).text());
 }
 
 var lastNamespace = '';
 
-Renderer.refreshMethods = function() {
+Renderer.refreshMethods = function(categorized) {
+	if (typeof categorized === "undefined" || categorized===null) categorized = true;
+
 	$(".method-list-item").off();
-	$("#"+Renderer.methodListElementId).find('a').remove();
+	$("#"+Renderer.methodListElementId).html('');
 	for (var method in SchemaHelper.schema.methods) {
-		var split = SchemaHelper.schema.methods[method].name.split('.');
-		var namespace = split[0] || '';
-		var methodName = split.slice(1, split.length).join(".") || '';
-		//$("#"+Renderer.methodListElementId).append('<li><a href="#" class="method-list-item">' + SchemaHelper.schema.methods[method].name + '</a></li>');
-		if (lastNamespace !== namespace) {
-			$("#"+Renderer.methodListElementId).append('<li><a href="#">' + namespace + '</a><ul class="nav"></ul></li>');
+		if (categorized) {
+			var split = SchemaHelper.schema.methods[method].name.split('.');
+			var namespace = split[0] || '';
+			var methodName = split.slice(1, split.length).join(".") || '';
+			if (lastNamespace !== namespace) {
+				$("#"+Renderer.methodListElementId).append('<li class="" id="method-list-header-'+namespace+'"><a href="#" data-toggle="pill" class="method-list-header">' + namespace + '</a><ul class="nav"></ul></li>');
+			}
+			$('#method-list-header-'+namespace).find("ul").append('<li class=""><a href="#" data-toggle="pill" class="method-list-item">' + methodName + '</a></li>');
+			lastNamespace = namespace;
+		}else{
+			$("#"+Renderer.methodListElementId).append('<li><a href="#" class="method-list-item">' + SchemaHelper.schema.methods[method].name + '</a></li>');
 		}
-		$("#"+Renderer.methodListElementId).find("ul").append('<li><a href="#" class="method-list-item">' + methodName + '</a></li>');
-		lastNamespace = namespace;
 	}
-	$(".method-list-item").on("click", Renderer.methodClickHandler);
+	$(".method-list-header").on("click", Renderer.methodHeaderClickHandler);
+	$(".method-list-item").on("click", Renderer.methodItemClickHandler);
 	Renderer.updateMethodCountBadge(SchemaHelper.getMethodCount());
 }
 

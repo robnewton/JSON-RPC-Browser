@@ -2,6 +2,7 @@ function SchemaHelper() {}
 
 SchemaHelper.init = function(schema) {
 	SchemaHelper.schema = schema;
+	//SchemaHelper.schema.methods.sort();
 }
 
 SchemaHelper.normalizeTypes = function(parameters) {

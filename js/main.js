@@ -3,14 +3,18 @@ jQuery(document).ready(function ($) {
 	ConnectionHelper.init();
 	Renderer.init();
 	Renderer.initNavMenu();
+
+    /** 
+        Case insensative search
+        Source: http://css-tricks.com/snippets/jquery/make-jquery-contains-case-insensitive/
+     **/
+    $.expr[":"].contains = $.expr.createPseudo(function(arg) {
+        return function( elem ) {
+            return $(elem).text().toUpperCase().indexOf(arg.toUpperCase()) >= 0;
+        };
+    });
 	
     //TEST TEST TEST TEST TEST TEST TEST TEST TEST TEST TEST TEST
     Renderer.loadSourceFromNewForm();
-	$('#'+Renderer.tryitFormId).submit(function() {
-        return FormBuilder.handleFormSubmit();
-    });
-    $('.bs-docs-container [href=#]').click(function (e) {
-      e.preventDefault()
-    });
     //TEST TEST TEST TEST TEST TEST TEST TEST TEST TEST TEST TEST
 });
