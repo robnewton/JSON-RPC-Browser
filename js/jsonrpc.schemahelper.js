@@ -1,26 +1,43 @@
-function Schema(raw) {
-	this.id = typeof (raw.lease_id) != 'undefined' ? raw.lease_id : 0;
+function SchemaHelper() {}
+
+SchemaHelper.init = function(schema) {
+	SchemaHelper.schema = schema;
 }
 
-function followRefs(paramsArray) {
-	$.each(paramsArray, function(key, paramDef) {
-		var refDef = null;
-		//Check to see if we have a reference to lookup at all
-		if (typeof paramDef.$ref === "string") {
-			refDef = getRefType(paramDef.$ref);
-			console.log('Reference type '+paramDef.$ref+' found:');
-			console.log(refDef);
-			paramsArray[key] = $.extend(paramsArray[key], refDef);
-			delete paramsArray[key]['$ref'];
-		}else{
-			//TODO: Process non-referencing parameter types (maybe nothing needs to be done?)
-			console.log('Non-referencing type found:');
-			console.log(paramDef);
+SchemaHelper.normalizeTypes = function(parameters) {
+	for (var i = 0; i < parameters.length; i++) {
+		if (typeof parameters[i].$ref != 'undefined') {
+			parameters[i] = $.extend(parameters[i], SchemaHelper.lookupReferenceType(parameters[i].$ref));
+			delete parameters[i]['$ref'];
 		}
-	});
-	return paramsArray;
+	}
+	return this.parameters;
 }
 
-function getRefType(name) {
-	return introspectionResult.types[name];
+SchemaHelper.lookupReferenceType = function(name) {
+	//TODO: This needs to step one step lower into type arrays and do lookups there too
+	var type = SchemaHelper.schema.types[name];
+	if ($.isArray(type)) {
+		for (var i = 0; i < type.length; i++) {
+			if (typeof type[i].$ref != 'undefined') {
+				type[i] = $.extend(type[i], SchemaHelper.lookupReferenceType(type[i].$ref));
+				delete type[i]['$ref'];
+			}
+		}
+	}else{
+		if (typeof type.$ref != 'undefined') {
+			type = $.extend(type, SchemaHelper.lookupReferenceType(type.$ref));
+			delete type['$ref'];
+		}
+	}
+	return type;
+}
+
+SchemaHelper.getMethodCount = function() {
+    var count = 0;
+    for(var prop in SchemaHelper.schema.methods) {
+        if(SchemaHelper.schema.methods.hasOwnProperty(prop))
+            ++count;
+    }
+    return count;
 }
