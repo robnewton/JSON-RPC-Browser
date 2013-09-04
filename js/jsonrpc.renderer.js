@@ -45,6 +45,10 @@ Renderer.loadSource = function() {
 
 		//Enrich the schema for easier processing
 		for (var key in result.methods) {
+			if (key == 'AudioLibrary.GetAlbums') {
+				console.log(key);
+			}
+			console.log(key);
 			result.methods[key].name = key;
 			SchemaHelper.normalizeTypes(result.methods[key].params);
 		}

@@ -7,7 +7,7 @@ function Connection(name, ajaxUrl, socketUrl) {
 
 Connection.prototype.connect = function() {
 	if ((this.conn === undefined) || (this.conn === null)) {
-		this.conn = new $.JsonRpcClient({ ajaxUrl: this.ajaxUrl, socketUrl: this.socketUrl });
+		this.conn = new $.JsonRpcClient({ ajaxUrl: this.ajaxUrl, socketUrl: this.socketUrl, onmessage: this.handleNonResponseError });
 		ConnectionHelper.addRecentConnection(this);
 	}
 }
@@ -34,4 +34,8 @@ Connection.prototype.handleError = function(error) {
 		error.message + " \n" + error.code + "",
 		JSON.stringify(error, null, 4)
 	);
+};
+
+Connection.prototype.handleNonResponseError = function(error) {
+	console.log(error);
 };

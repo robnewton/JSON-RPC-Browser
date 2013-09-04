@@ -175,7 +175,7 @@ FormBuilder.handlePillboxAdd = function(sender){
 	var value = $('#'+input).val();
 	if (value != '') {
 		if ($('#'+base).find('li:contains("'+value+'")').length < 1) {  //Is this pill unique
-			if ($('#'+dropdown).find('a:contains("'+value+'")').length > 0) {  //KIs this pill allowed
+			if (($('#'+dropdown).find('a:contains("'+value+'")').length > 0) && ($('#'+base).hasClass('unique'))) {  //Is this pill allowed
 				$('#'+base+' ul').append('<li class="status-primary">'+value+'</li>');
 			}
 		}
@@ -195,10 +195,22 @@ FormBuilder.getPillBoxPills = function(pillBoxId){
 FormBuilder.autoBuildInput = function(target, param, id) {
 	if (typeof id === "undefined" || id===null) id = "";
 	
-	if ($.isArray(param.type)) {
-		FormBuilder.buildMultitypeInput(target, param, id);
+	if (typeof param.circularReferences != 'undefined') {
+		//Do not try to draw input
+		target.append('Circular reference could not be rendered.');
 	}else{
-		FormBuilder.autoBuildInputElement(target, param, id);
+		if ($.isArray(param.type)) {
+			FormBuilder.buildMultitypeInput(target, param, id);
+		}else{
+			if (typeof param.type != 'undefined') {
+				FormBuilder.autoBuildInputElement(target, param, id);
+			}else{
+				//There is no type, so check for the "items" array
+				if (typeof param.items != 'undefined') {
+					//TODO: What is the type if param.type doesn't exist?
+				}
+			}
+		}
 	}
 }
 
@@ -239,10 +251,6 @@ FormBuilder.autoBuildInputElement = function(target, typeDef, id) {
 			}
 			break;
 	}
-}
-
-FormBuilder.test = function(sender) {
-	console.log(sender.text);
 }
 
 FormBuilder.buildArrayInput = function(target, typeDef, id) {
