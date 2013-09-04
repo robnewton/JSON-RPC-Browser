@@ -15,6 +15,7 @@ jQuery(document).ready(function ($) {
     });
 	
     //TEST TEST TEST TEST TEST TEST TEST TEST TEST TEST TEST TEST
+    //Auto connect using the connection's form default values
     //Renderer.loadSourceFromNewForm();
     //TEST TEST TEST TEST TEST TEST TEST TEST TEST TEST TEST TEST
 });

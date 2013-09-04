@@ -117,6 +117,7 @@ FormBuilder.getMultitypeInputValue = function(param, id) {
 FormBuilder.autoGetInputValue = function(param, id) {
 	if (typeof id === "undefined" || id===null) id = "";
 
+		
 	if (typeof param.type !== "undefined") {
 		switch (param.type) {
 			case "boolean":
@@ -142,6 +143,11 @@ FormBuilder.autoGetInputValue = function(param, id) {
 						obj[prop] = FormBuilder.autoGetInputValue(param.properties[prop], id + '-obj-' + prop);
 					}
 					return obj;
+				}
+				break;
+			default:
+				if ($.isArray(param.type)) {
+					return FormBuilder.getMultitypeInputValue(param, id);
 				}
 				break;
 		}

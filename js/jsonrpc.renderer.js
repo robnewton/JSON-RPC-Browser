@@ -66,27 +66,32 @@ Renderer.showResponse = function(result) {
 
 Renderer.showError = function(message, details) {
 	console.log(message);
+	Renderer.appendToCallHistory(true);
 	$('#'+Renderer.tryitResponseId).text(details);
 	$('#'+Renderer.tryitResponseId).show();
 }
 
-Renderer.appendToCallHistory = function() {
+Renderer.appendToCallHistory = function(failed) {
 	var url = ConnectionHelper.openConnection.ajaxUrl + '?request='+JSON.stringify(ConnectionHelper.openConnection.conn.getPriorRequest());
 	var now = new Date().getTime();
 	var timestamp = timeStamp();
+	var color = (failed ? 'danger' : 'info');
 	$('#history-body').prepend(''+
-		'<div class="alert alert-info alert-dismissable">'+
+		'<div class="alert alert-'+color+' alert-dismissable">'+
 		'	<button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>'+
-		'	<strong style="cursor: pointer;" data-toggle="collapse" data-target=".history-item-'+now+'">'+ConnectionHelper.openConnection.conn.getPriorRequest().method+'</strong><span class="caret"></span> <small class="history-item-'+now+'">'+timestamp+'</small>'+
+		'	<strong style="cursor: pointer;" data-toggle="collapse" data-target=".history-item-'+now+'">'+ConnectionHelper.openConnection.conn.getPriorRequest().method+'</strong><span class="caret"></span> <small>'+timestamp+'</small>'+
 		'	<div class="collapse history-item-'+now+'">'+
 		'		<br>'+
-		'		<pre>'+url+'</pre>'+
+		'		<pre><code>'+url+'</code></pre>'+
 		'		<small>'+timestamp+'</small>'+
 		'		<a href=\''+url+'\' target="_blank" class="alert-link pull-right">'+
 		'			<small>Open in a New Tab</small>'+
 		'		</a><br>'+
 		'	</div>'+
 		'</div>');
+	$(document).ready(function() {
+		$('pre code').each(function(i, e) {hljs.highlightBlock(e)});
+	});
 }
 
 Renderer.filterMethods = function(element, what) {
