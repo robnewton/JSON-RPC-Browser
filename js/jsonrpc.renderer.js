@@ -136,12 +136,12 @@ Renderer.loadMethod = function(methodName) {
 	
 	//Render the try it tab
 	//$('#'+Renderer.tryitFormId).find('fieldset').remove();
-	$('#'+Renderer.tryitFormId).find('button').remove();
+	//$('#'+Renderer.tryitFormId).find('button').remove();
 	//$('#'+Renderer.tryitFormId).append('<fieldset id="tryit-form-required"><legend>Required</legend><div class="form-group"></div></fieldset>');
 	//$('#'+Renderer.tryitFormId).append('<fieldset id="tryit-form-optional"><legend>Optional</legend><div class="form-group"></div></fieldset>');
 	$('#'+Renderer.tryitFormId).find('div.form-group').html('');
-	$('#'+Renderer.tryitFormId).prepend('<button type="submit" class="btn btn-default">Submit</button><p></p>');
-	$('#'+Renderer.tryitFormId).append('<button type="submit" class="btn btn-default">Submit</button><p></p><p></p>');
+	//$('#'+Renderer.tryitFormId).prepend('<button type="submit" class="btn btn-primary  btn-xs">Submit</button><p></p>');
+	//$('#'+Renderer.tryitFormId).append('<button type="submit" class="btn btn-primary  btn-xs">Submit</button><p></p><p></p>');
 
 	//Render the parameters table in the details tab
 	for (var i = 0; i < method.params.length; i++) {

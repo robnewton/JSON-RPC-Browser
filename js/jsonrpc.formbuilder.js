@@ -16,9 +16,7 @@ FormBuilder.buildForm = function() {
 	for (var i = 0; i < Renderer.loadedMethod.params.length; i++) {
 		var parameter = Renderer.loadedMethod.params[i];
 		var topFieldset = (parameter.required ? '#tryit-form-required' : '#tryit-form-optional');
-		$(topFieldset + ' div.form-group').append('<label class="col-lg-2 control-label tryit-optional-toggle" id="tryit-' + parameter.name + '-label" for="tryit-' + parameter.name + '-type1-input" title="' + (parameter.required ? parameter.name : 'Click here to enable the ' + parameter.name + ' optional parameter.') + '">' + parameter.name + '</label><div class="col-lg-10 panel panel-default clearfix" id="tryit-' + parameter.name + '-div"><fieldset id="tryit-' + parameter.name + '-fieldset" '+(parameter.required ? '' : 'disabled')+'></fieldset></div>');
-		//<br><div class="make-switch switch-mini tryit-optional-toggle" id="tryit-' + parameter.name + '-toggle" data-on-label="<i class=\'switch-mini-font-icons fui-check icon-white\'></i>" data-off-label="<i class=\'switch-mini-font-icons fui-cross\'></i>"><input type="checkbox" /></div>
-		//$('#tryit-' + parameter.name + '-label').append('<br><div class="make-switch switch-mini tryit-optional-toggle" id="tryit-' + parameter.name + '-toggle"><input type="checkbox" /></div>');
+		$(topFieldset + ' div.form-group').append('<label class="col-lg-2 control-label tryit-optional-toggle" id="tryit-' + parameter.name + '-label" for="tryit-' + parameter.name + '-type1-input" title="' + (parameter.required ? parameter.name : 'Click here to enable the ' + parameter.name + ' optional parameter.') + '">' + parameter.name + '</label><div class="col-lg-10 panel panel-primary clearfix" id="tryit-' + parameter.name + '-div"><fieldset id="tryit-' + parameter.name + '-fieldset" '+(parameter.required ? '' : 'disabled')+'></fieldset></div>');
 		$('#tryit-' + parameter.name + '-toggle').bootstrapSwitch();
 		FormBuilder.autoBuildInput($('#tryit-' + parameter.name + '-fieldset'), parameter, 'tryit-' + parameter.name );
 	}
@@ -47,8 +45,14 @@ FormBuilder.buildForm = function() {
 
 	$('#'+Renderer.tryitFormId).off();
 	$('#'+Renderer.tryitFormId).submit(function() {
-        return FormBuilder.handleFormSubmit();
+        FormBuilder.handleFormSubmit();
+        return false;
     });
+
+	$("#tryit-form .pillbox-add").off();
+	$("#tryit-form .pillbox-add").on('click', function () {
+		FormBuilder.handlePillboxAdd(this.id);
+	});
 }
 
 FormBuilder.handleFormSubmit = function(){
@@ -75,7 +79,6 @@ FormBuilder.handleFormSubmit = function(){
 		params,
 		Renderer.showResponse
 	);
-    return false;
 }
 
 FormBuilder.getParameterValue = function(param, id) {
@@ -113,7 +116,7 @@ FormBuilder.autoGetInputValue = function(typeDef, id) {
 			return parseInt($('#'+id).val());
 			break;
 		case "array":
-			return $('#'+id).val().split(',');
+			return FormBuilder.getPillBoxPills(id);
 			break;
 		case "string":
 			if ($.isArray(typeDef.enums)) {
@@ -150,27 +153,43 @@ FormBuilder.handleOptionalParameterToggle = function(sender){
 }
 
 FormBuilder.handleTypePickerClick = function(sender){
-	//id example: tryit-parameter-type#-picker
+	//id example: tryit-parameter-type{$index}-picker
  	var split = sender.split("-");
  	var base = split.slice(0, split.length - 2).join("-");
  	var baseType = split.slice(0, split.length - 1).join("-");
 
-	//Loop through each fieldset and disable it
 	$("#tryit-form ."+base+"-type-fieldset").prop('disabled', true);
-	//Enable the selected fieldset
 	$("#"+baseType+"-fieldset").prop('disabled', false);
-
-	//Loop through each panel to change the background
 	$("#tryit-form ."+base+"-panel").css("background-color", "#F2F2F2");
-	//Change the background of the selected panel to default
 	$("#"+baseType+"-panel").css('background', 'transparent');
-
-	//Loop through each button and display it and make it available to be clicked
-	//$("#tryit-form :button."+base+"-picker").prop('disabled', false);
 	$("#tryit-form :button."+base+"-picker").show();
-	//Change the color of the clicked button to something indicating disabled (or selected)
-	//$('#'+sender).prop('disabled', true);
 	$('#'+sender).hide();
+}
+
+FormBuilder.handlePillboxAdd = function(sender){
+	//id example: tryit-parameter--type{$index}-add
+	var split = sender.split("-");
+	var base = split.slice(0, split.length - 1).join("-");
+	var input = base + '-input';
+	var dropdown = base + '-dropdown';
+	var value = $('#'+input).val();
+	if (value != '') {
+		if ($('#'+base).find('li:contains("'+value+'")').length < 1) {  //Is this pill unique
+			if ($('#'+dropdown).find('a:contains("'+value+'")').length > 0) {  //KIs this pill allowed
+				$('#'+base+' ul').append('<li class="status-primary">'+value+'</li>');
+			}
+		}
+		$('#'+input).val('');
+	}
+}
+
+FormBuilder.getPillBoxPills = function(pillBoxId){
+	var items = $('#'+pillBoxId).pillbox('items');
+	var pills = [];
+	for (var i = 0; i < items.length; i++) {
+		pills.push(items[i].text);
+	};
+	return pills;
 }
 
 FormBuilder.autoBuildInput = function(target, param, id) {
@@ -187,7 +206,7 @@ FormBuilder.buildMultitypeInput = function(target, param, id) {
 	if (typeof id === "undefined" || id===null) id = "";
 	  
 	if ($.isArray(param.type)) {
-		target.append('<div class="panel-heading"><small class="text-muted">Pick a parameter type...</small><span class="badge pull-right">multitype</span></div>');
+		target.append('<div class="panel-heading"><small>Pick a parameter type...</small><span class="badge pull-right">multitype</span></div>');
 		for (var key = 0; key < param.type.length; key++) {
 			target.append('<div class="panel panel-default clearfix '+id+'-panel" id="'+id+'-type'+key+'-panel"><fieldset class="col-lg-11 '+id+'-type-fieldset" id="'+id+'-type'+key+'-fieldset"></fieldset><button type="button" class="btn btn-primary btn-xs col-lg-1 tryit-type-picker '+id+'-picker" id="'+id+'-type'+key+'-picker">Pick</button></div>');
 			FormBuilder.autoBuildInputElement($('#'+id+'-type'+key+'-fieldset'), param.type[key], id+'-type'+key+'-input');
@@ -222,13 +241,39 @@ FormBuilder.autoBuildInputElement = function(target, typeDef, id) {
 	}
 }
 
+FormBuilder.test = function(sender) {
+	console.log(sender.text);
+}
+
 FormBuilder.buildArrayInput = function(target, typeDef, id) {
 	if (typeof id === "undefined" || id===null) id = "";
 	
 	if (typeDef.type=='array') {
 		var arrayInput = '';
-		arrayInput += '<input type="text" class="form-control" id="'+id+'">';
+		arrayInput += '' +
+			'<div class="input-group">'+
+				'<input type="text" class="form-control" id="'+id+'-input">'+
+				'<div class="input-group-btn">'+
+					'<button class="btn btn-primary pillbox-add" id="'+id+'-add" type="button">Add</button>'+
+					'<button type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown" tabindex="-1">'+
+						'<span class="caret"></span>'+
+					'</button>'+
+					'<ul class="dropdown-menu" id="'+id+'-dropdown">';
+						for (var i = 0; i < typeDef.items.enums.length; i++) {
+							arrayInput += '<li><a href="#" onclick="$(\'#'+id+'-input\').val(this.text)">'+typeDef.items.enums[i]+'</a></li>';
+						};
+						arrayInput += '' +
+					'</ul>'+
+				'</div>'+
+			'</div><br>'+
+			'<div class="well fuelux" style="">'+
+				'<div id="'+id+'" class="pillbox'+((typeDef.uniqueItems)?' unique':'')+'">'+
+					'<ul>'+
+					'</ul>'+
+				'</div>'+
+			'</div>';
 		target.append(arrayInput);
+		$('.dropdown-toggle').dropdown();
 	}else{
 		console.log('Not an array parameter');
 	}

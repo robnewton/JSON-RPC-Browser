@@ -15,8 +15,11 @@ SchemaHelper.normalizeTypes = function(parameters) {
 	return this.parameters;
 }
 
+SchemaHelper.lookupExtension = function(name) {
+	var type = SchemaHelper.schema.types[name];
+}
+
 SchemaHelper.lookupReferenceType = function(name) {
-	//TODO: This needs to step one step lower into type arrays and do lookups there too
 	var type = SchemaHelper.schema.types[name];
 	if ($.isArray(type)) {
 		for (var i = 0; i < type.length; i++) {
@@ -29,6 +32,11 @@ SchemaHelper.lookupReferenceType = function(name) {
 		if (typeof type.$ref != 'undefined') {
 			type = $.extend(type, SchemaHelper.lookupReferenceType(type.$ref));
 			delete type['$ref'];
+		}else if (typeof type.extends != 'undefined') {
+			var extensionType = SchemaHelper.lookupReferenceType(type.extends);
+			type.type = extensionType.type;
+			type.uniqueItems = extensionType.uniqueItems;
+			delete type['extends'];
 		}
 	}
 	return type;
