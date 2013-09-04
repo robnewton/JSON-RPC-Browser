@@ -16,8 +16,18 @@ FormBuilder.buildForm = function() {
 	for (var i = 0; i < Renderer.loadedMethod.params.length; i++) {
 		var parameter = Renderer.loadedMethod.params[i];
 		var topFieldset = (parameter.required ? '#tryit-form-required' : '#tryit-form-optional');
-		$(topFieldset + ' div.form-group').append('<label class="col-lg-2 control-label tryit-optional-toggle" id="tryit-' + parameter.name + '-label" for="tryit-' + parameter.name + '-type1-input" title="' + (parameter.required ? parameter.name : 'Click here to enable the ' + parameter.name + ' optional parameter.') + '">' + parameter.name + '</label><div class="col-lg-10 panel panel-primary clearfix" id="tryit-' + parameter.name + '-div"><fieldset id="tryit-' + parameter.name + '-fieldset" '+(parameter.required ? '' : 'disabled')+'></fieldset></div>');
-		$('#tryit-' + parameter.name + '-toggle').bootstrapSwitch();
+		$(topFieldset + ' div.form-group').append(''+
+			'<label class="col-lg-2 control-label tryit-optional-toggle" id="tryit-' + parameter.name + '-label" for="tryit-' + parameter.name + '-type1-input" title="' + (parameter.required ? parameter.name : 'Click here to enable the ' + parameter.name + ' optional parameter.') + '">'+
+				parameter.name +
+				//(parameter.required ? '' : '<br><button type="button" class="btn btn-primary btn-xs">Enable</button>') +
+				(parameter.required ? '' : '<br><input type="checkbox"/>') +
+			'</label>'+
+			'<div class="col-lg-10 panel panel-primary" id="tryit-' + parameter.name + '-div">'+
+				'<div class="panel-body">'+
+					'<fieldset id="tryit-' + parameter.name + '-fieldset" '+(parameter.required ? '' : 'disabled')+'  style="width:100%">'+
+					'</fieldset>'+
+				'</div>'+
+			'</div>');
 		FormBuilder.autoBuildInput($('#tryit-' + parameter.name + '-fieldset'), parameter, 'tryit-' + parameter.name );
 	}
 
@@ -56,10 +66,9 @@ FormBuilder.buildForm = function() {
 }
 
 FormBuilder.handleFormSubmit = function(){
-    //console.log(JSON.stringify($('#tryit-form').serializeObject()));
-
-	//Example of getting the value of the selected radio style button group
-	//var includeicon=$("[name='includeicon'].active").val();
+	try {
+		window.scrollTo(0, 0);
+	}catch(e){}
 
 	var params = {};
 	for (var i = 0; i < Renderer.loadedMethod.params.length; i++) {
@@ -227,9 +236,32 @@ FormBuilder.buildMultitypeInput = function(target, param, id) {
 	if (typeof id === "undefined" || id===null) id = "";
 	  
 	if ($.isArray(param.type)) {
-		target.append('<div class="panel-heading"><small>Pick a parameter type...</small><span class="badge pull-right">multitype</span></div>');
+		//target.parent().prepend('<div class="panel-heading"><small>Pick a parameter type...</small><span class="badge pull-right">multitype</span></div>');
+		//target.parent().prepend('<div class=""><small>Pick a parameter type...</small><span class="badge pull-right">multitype</span></div>');
+		//target.parent().prepend('<small>Pick a parameter type...</small><span class="badge pull-right">multitype</span>');
 		for (var key = 0; key < param.type.length; key++) {
-			target.append('<div class="panel panel-default clearfix '+id+'-panel" id="'+id+'-type'+key+'-panel"><fieldset class="col-lg-11 '+id+'-type-fieldset" id="'+id+'-type'+key+'-fieldset"></fieldset><button type="button" class="btn btn-primary btn-xs col-lg-1 tryit-type-picker '+id+'-picker" id="'+id+'-type'+key+'-picker">Pick</button></div>');
+			if (key === 0) {
+				target.append('<div class="alert alert-danger"><strong>Multitype: </strong><small>Pick a parameter type...</small></div>');
+			}
+			target.append('<div class="panel panel-default clearfix '+id+'-panel" id="'+id+'-type'+key+'-panel"><div class="panel-body"><fieldset class="col-lg-11 '+id+'-type-fieldset" id="'+id+'-type'+key+'-fieldset"></fieldset><button type="button" class="btn btn-primary btn-xs col-lg-1 tryit-type-picker '+id+'-picker" id="'+id+'-type'+key+'-picker">Pick</button></div></div>');
+			FormBuilder.autoBuildInputElement($('#'+id+'-type'+key+'-fieldset'), param.type[key], id+'-type'+key+'-input');
+		}
+		//Default the selected type to the first one in the list
+		FormBuilder.handleTypePickerClick(id+'-type0-picker');
+	}else{
+		console.log('Not a multitype parameter');
+	}
+}
+
+FormBuilder.buildMultitypeInput2 = function(target, param, id) {
+	if (typeof id === "undefined" || id===null) id = "";
+	  
+	if ($.isArray(param.type)) {
+		target.append('<div class="panel panel-primary"></div>');
+		target.find('div:first').append('<div class="panel-heading"><small>Pick a parameter type...</small><span class="badge pull-right">multitype</span></div>');
+		target.find('div:first').append('<div class="panel-body"></div>');
+		for (var key = 0; key < param.type.length; key++) {
+			target.find('div:last').append('<div class="panel panel-default '+id+'-panel" id="'+id+'-type'+key+'-panel"><div class="panel-body"><fieldset class="col-lg-11 '+id+'-type-fieldset" id="'+id+'-type'+key+'-fieldset"></fieldset><button type="button" class="btn btn-primary btn-xs col-lg-1 tryit-type-picker '+id+'-picker" id="'+id+'-type'+key+'-picker">Pick</button></div></div>');
 			FormBuilder.autoBuildInputElement($('#'+id+'-type'+key+'-fieldset'), param.type[key], id+'-type'+key+'-input');
 		}
 		//Default the selected type to the first one in the list
@@ -264,7 +296,7 @@ FormBuilder.autoBuildInputElement = function(target, param, id) {
 				if (typeof param.properties != 'undefined') {
 					for (var prop in param.properties) {
 						target.append('<label class="control-label">' + prop + '</label><br>');
-						target.append('<div class="panel panel-primary clearfix"></div>');
+						target.append('<div class="panel panel-primary clearfix"><div class="panel-body"></div></div>');
 						FormBuilder.autoBuildInput(target.find('div:last'), param.properties[prop], id + '-obj-' + prop);
 					}
 				}
@@ -367,17 +399,8 @@ FormBuilder.buildBooleanInput = function(target, param, id) {
 	
 	if (param.type=='boolean') {
 		var booleanInput = '';
-		//booleanInput += '<div class="make-switch" id="'+id+'-switch"><input type="checkbox" class="myClass" />Boolean</div>';
-		//booleanInput += '<input type="radio" class="myClass" value="1" id="'+id+'-switch" name="'+id+'-switch">';
 		booleanInput += '<label class="radio-inline"><input class="myClass" type="radio" name="'+id+'-switch" id="'+id+'-switch-true" value="true" checked>True</label><label class="radio-inline"><input class="myClass" type="radio" name="'+id+'-switch" id="'+id+'-switch-false" value="false">False</label>';
-		/*booleanInput += ''+
-		'<div class="btn-group" data-toggle="buttons">'+
-			'<label class="btn btn-success tryit-boolean-toggle active"><input type="radio" name="'+id+'-switch" id="'+id+'-switch-true"> <i class="icon-ok icon-white"></i></label>'+
-			'<label class="btn btn-danger tryit-boolean-toggle"><input type="radio" name="'+id+'-switch" id="'+id+'-switch-false"> False</label>'+
-		'</div>';*/
 		target.append(booleanInput);
-		$('input.myClass').prettyCheckable();
-		//$('#'+id+'-switch').bootstrapSwitch();
 	}else{
 		console.log('Not a boolean parameter');
 	}

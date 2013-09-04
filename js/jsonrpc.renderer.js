@@ -154,6 +154,9 @@ Renderer.loadMethod = function(methodName) {
 
 	var method = Renderer.loadedMethod;
 	$('#tabs a[href="#try"]').tab('show');
+	try {
+		window.scrollTo(0, 0);
+	}catch(e){}
 
 	//Render the details tab
 	$("#"+Renderer.parametersTableId).find("tr:gt(0)").remove();

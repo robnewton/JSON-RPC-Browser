@@ -15,6 +15,6 @@ jQuery(document).ready(function ($) {
     });
 	
     //TEST TEST TEST TEST TEST TEST TEST TEST TEST TEST TEST TEST
-    Renderer.loadSourceFromNewForm();
+    //Renderer.loadSourceFromNewForm();
     //TEST TEST TEST TEST TEST TEST TEST TEST TEST TEST TEST TEST
 });

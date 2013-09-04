@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -6,76 +5,70 @@
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
 	<meta name="description" content="">
 	<meta name="author" content="">
+    <link rel="shortcut icon" href="../../assets/ico/favicon.png">
 
-	<title>JSON-RPC Browser - v0.7</title>
+	<title>JSON-RPC Browser - v0.8</title>
 
 	<!-- Bootstrap core CSS -->
 	<link href="css/bootstrap.css" rel="stylesheet">
-	<!-- Theme Tests
-	<link href="css/themes/bootstrap-amelia.css" rel="stylesheet">
-	<link href="css/themes/bootstrap-cerulean.css" rel="stylesheet">
-	<link href="css/themes/bootstrap-cosmo.css" rel="stylesheet">
-	<link href="css/themes/bootstrap-flatly.css" rel="stylesheet">
-	<link href="css/themes/bootstrap-slate.css" rel="stylesheet">
-	<link href="css/themes/bootstrap-slider.css" rel="stylesheet">
-	<link href="css/themes/bootstrap-spacelab.css" rel="stylesheet">
-	<link href="css/themes/bootstrap-switch.css" rel="stylesheet">
-	<link href="css/themes/bootstrap-united.css" rel="stylesheet">
-	-->
+
+	<!-- Vendor component styles -->
+	<link href="css/fuelux.css" rel="stylesheet">
+	<link href="css/bootstrap-slider.css" rel="stylesheet">
+	<link href="css/bootstrap-sidebar.css" rel="stylesheet">
 
 	<!-- Custom styles for this template -->
-	<link href="css/sticky-footer-navbar.css" rel="stylesheet">
-	<link href="css/forms-tweak.css" rel="stylesheet">
-	<link href="css/bootstrap-switch.css" rel="stylesheet">
-	<link href="css/bootstrap-slider.css" rel="stylesheet">
-	<link href="css/flat-ui-fonts.css" rel="stylesheet">
-	<link href="css/prettyCheckable/prettyCheckable.css" rel="stylesheet">
-	<link href="css/fuelux.css" rel="stylesheet">
-	<link href="css/bootstrap-sidebar.css" rel="stylesheet">
-	<link href="css/skinnyGrayScrollBars.css" rel="stylesheet">
 	<link href="css/main.css" rel="stylesheet">
+	<link href="css/forms-tweak.css" rel="stylesheet">
+	<link href="css/navbar-fixed-top.css" rel="stylesheet">
+	<link href="css/skinnyGrayScrollBars.css" rel="stylesheet">
+
+    <!-- HTML5 shim and Respond.js IE8 support of HTML5 elements and media queries -->
+    <!--[if lt IE 9]>
+      <script src="js/vendor/html5shiv.js"></script>
+      <script src="js/vendor/respond.min.js"></script>
+    <![endif]-->
 </head>
 
 <body>
-
-	<!-- Wrap all page content here -->
-	<div id="wrap" class="scrollable">
-
-		<!-- Fixed navbar -->
-		<div class="navbar navbar-fixed-top">
-			<div class="container">
-				<button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".nav-collapse">
+	<!-- Fixed navbar -->
+	<div class="navbar navbar-default navbar-fixed-top">
+		<div class="container">
+			<div class="navbar-header">
+				<button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
 					<span class="icon-bar"></span>
 					<span class="icon-bar"></span>
 					<span class="icon-bar"></span>
 				</button>
-				<a class="navbar-brand" href="#">JSON-RPC Browser - v0.7</a>
-				<div class="nav-collapse collapse">
-					<ul class="nav navbar-nav">
-						<li class="dropdown">
-							<a href="#" class="dropdown-toggle" data-toggle="dropdown">Connection <b class="caret"></b></a>
-							<ul class="dropdown-menu" id="connection-menu">
-								<li><a href="#" id="new-connection-button">New</a></li>
-								<li class="divider"></li>
-								<li class="nav-header">Recent</li>
-							</ul>
-						</li>
-					</ul>
-					<ul class="nav navbar-nav pull-right">
-						<li><a href="#" id="connection-display"></a></li>
-					</ul>
-				</div><!-- /.nav-collapse -->
+				<a class="navbar-brand" href="#">JSON-RPC Browser - v0.8</a>
 			</div>
+			<div class="navbar-collapse collapse">
+				<ul class="nav navbar-nav">
+					<li class="dropdown">
+						<a href="#" class="dropdown-toggle" data-toggle="dropdown">Connection <b class="caret"></b></a>
+						<ul class="dropdown-menu">
+							<li><a href="#" id="new-connection-button">New</a></li>
+							<li class="divider"></li>
+							<li class="nav-header"><a href="#">Recent</a></li>
+						</ul>
+					</li>
+				</ul>
+				<ul class="nav navbar-nav navbar-right">
+					<li><a href="#" id="connection-display"></a></li>
+				</ul>
+			</div><!--/.nav-collapse -->
 		</div>
+	</div>
 
-		<!-- Begin page content -->
-		<div class="container">
-			<div class="row" id="connection-panel">
+	<!-- Begin page content -->
+	<div class="container">
+		<div class="affix row" id="connection-panel">
 
-				<!-- Connection settings -->
-				<div class="col-lg-8">
-					<div class="panel panel-default clearfix">
-						<div class="panel-heading">Connection</div>
+			<!-- Connection settings -->
+			<div class="col-lg-8">
+				<div class="panel panel-default clearfix">
+					<div class="panel-heading">Connection</div>
+					<div class="panel-body">
 						<p>Type the connection information in the form below.</p>
 						<form class="form-horizontal" id="connection-form">
 							<fieldset>
@@ -96,93 +89,95 @@
 									<label for="path">Path</label>
 									<input type="text" class="form-control" id="path" placeholder="/jsonrpc" value="/jsonrpc">
 								</div>
-								<button type="submit" onclick="Renderer.loadSourceFromNewForm();return false;" class="btn btn-default">Submit</button>
-								<button onclick="$('#'+Renderer.connectionPanelId).hide();return false;" class="btn btn-default">Cancel</button>
+								<button type="submit" onclick="Renderer.loadSourceFromNewForm();return false;" class="btn btn-primary">Submit</button>
+								<button onclick="$('#'+Renderer.connectionPanelId).hide();return false;" class="btn btn-primary">Cancel</button>
 							</fieldset>
 						</form>
 					</div>
 				</div>
-
 			</div>
 
-			<div class="method-title affix row">
-				<!-- Selected method detail -->
-				<div class="col-lg-5">
-					<h2 id="method-name"></h2>
-					<p id="method-desc" height="100px">Choose a method from the list on the right.</p>
-				</div>
-			</div>
-			<div class="method-tab-row affix row">
-				<div class="col-lg-5">
-					<ul id="tabs" class="nav nav-tabs" data-tabs="tabs">
-						<li><a href="#try" data-toggle="tab">Try It</a></li>
-						<li><a href="#details" data-toggle="tab">Parameters</a></li>
-						<li><a href="#schema" data-toggle="tab">Schema</a></li>
-						<li><a href="#python" data-toggle="tab">Python</a></li>
-						<li><a href="#history" data-toggle="tab">History</a></li>
-					</ul>
-				</div>
-			</div>
+		</div>
 
-			<div class="row" id="app-container">
-				<div class="col-lg-8">
-					<div id="my-tab-content" class="tab-content">
-						<div class="tab-pane" id="try">
-							<p></p>
-							<p>The form below is auto generated based upon the API introspection. Type some values and get a response!</p>
-							<pre class="pre-scrollable" id="tryit-response" hidden="true"> </pre>
-							<p></p>
-							<form class="form-horizontal" id="tryit-form">
-								<div class="panel panel-default  clearfix">
-									<div class="panel-heading">Required<button type="submit" class="btn btn-primary  btn-xs pull-right">Call Method</button></div>
-									<fieldset id="tryit-form-required"><div class="form-group"></div></fieldset>
-								</div>
-								<div class="panel panel-default clearfix">
-									<div class="panel-heading">Optional<button type="submit" class="btn btn-primary  btn-xs pull-right">Call Method</button></div>
-									<fieldset id="tryit-form-optional"><div class="form-group"></div></fieldset>
-									<div class="panel-footer">Optional<button type="submit" class="btn btn-primary  btn-xs pull-right">Call Method</button></div>
-								</div>
-							</form>
-						</div>
-						<div class="tab-pane" id="details">
-							<p></p>
-							<table class="table table-hover" id="params-table">
-								<thead>
-									<tr>
-										<th></th>
-										<th>Required</th>
-										<th>Type</th>
-										<th>Default</th>
-									</tr>
-								</thead>
-								<tbody>
-								</tbody>
-							</table>
-						</div>
-						<div class="tab-pane" id="schema">
-							<p></p>
-							<pre class="pre-scrollable" id="schema-json"></pre>
-						</div>
-						<div class="tab-pane" id="python">
-							<p></p>
-							<pre class="pre-scrollable" id="python-code"></pre>
-						</div>
-						<div class="tab-pane" id="history">
-							<p></p>
-							<p></p>
-							<p></p>
-							<button class="btn btn-primary" type="button" onclick="$('#history-body').html('');">Clear</button>
-							<p></p>
-							<div class="tab-pane" id="history-body">
+		<div class="method-title affix row">
+			<!-- Selected method detail -->
+			<div class="col-lg-5">
+				<h2 id="method-name"></h2>
+				<p id="method-desc" height="100px">Start by connecting to a JSON-RPC source by choosing Connection > New</p>
+			</div>
+		</div>
+		<div class="method-tab-row affix row">
+			<div class="col-lg-5">
+				<ul id="tabs" class="nav nav-tabs" data-tabs="tabs">
+					<li><a href="#try" data-toggle="tab">Try It</a></li>
+					<li><a href="#details" data-toggle="tab">Parameters</a></li>
+					<li><a href="#schema" data-toggle="tab">Schema</a></li>
+					<li><a href="#python" data-toggle="tab">Python</a></li>
+					<li><a href="#history" data-toggle="tab">History</a></li>
+				</ul>
+			</div>
+		</div>
+
+		<div class="row" id="app-container">
+			<div class="col-lg-8">
+				<div id="my-tab-content" class="tab-content">
+					<div class="tab-pane" id="try">
+						<p></p>
+						<p>The form below is auto generated based upon the API introspection. Type some values and get a response!</p>
+						<pre class="pre-scrollable" id="tryit-response" hidden="true"> </pre>
+						<p></p>
+						<form class="form-horizontal" id="tryit-form">
+							<div class="panel panel-default">
+								<div class="panel-heading">Required<button type="submit" class="btn btn-primary  btn-xs pull-right">Call Method</button></div>
+								<div class="panel-body"><fieldset id="tryit-form-required"><div class="form-group"></div></fieldset></div>
 							</div>
+							<div class="panel panel-default">
+								<div class="panel-heading">Optional<button type="submit" class="btn btn-primary  btn-xs pull-right">Call Method</button></div>
+								<div class="panel-body"><fieldset id="tryit-form-optional"><div class="form-group"></div></fieldset></div>
+								<div class="panel-footer">Optional<button type="submit" class="btn btn-primary  btn-xs pull-right">Call Method</button></div>
+							</div>
+						</form>
+					</div>
+					<div class="tab-pane" id="details">
+						<p></p>
+						<table class="table table-hover" id="params-table">
+							<thead>
+								<tr>
+									<th></th>
+									<th>Required</th>
+									<th>Type</th>
+									<th>Default</th>
+								</tr>
+							</thead>
+							<tbody>
+							</tbody>
+						</table>
+					</div>
+					<div class="tab-pane" id="schema">
+						<p></p>
+						<pre class="pre-scrollable" id="schema-json"></pre>
+					</div>
+					<div class="tab-pane" id="python">
+						<p></p>
+						<pre class="pre-scrollable" id="python-code"></pre>
+					</div>
+					<div class="tab-pane" id="history">
+						<p></p>
+						<p></p>
+						<p></p>
+						<button class="btn btn-primary" type="button" onclick="$('#history-body').html('');">Clear</button>
+						<p></p>
+						<div class="tab-pane" id="history-body">
 						</div>
 					</div>
 				</div>
+			</div>
 
-				<!-- Methods Column -->
-				<div class="col-lg-4" id="methods-sidebar">
-					<div class="panel panel-primary clearfix fixed">
-						<div class="panel-heading">Methods<span class="badge pull-right" id="method-count"></span></div>
+			<!-- Methods Column -->
+			<div class="col-lg-4" id="methods-sidebar">
+				<div class="panel panel-primary clearfix fixed">
+					<div class="panel-heading">Methods<span class="badge pull-right" id="method-count"></span></div>
+					<div class="panel-body">
 						<div class="input-group">
 							<input type="text" class="form-control" onkeyup="Renderer.filterMethods(this,'methods')" id="method-filter-input">
 							<span class="input-group-btn">
@@ -190,19 +185,13 @@
 							</span>
 						</div><!-- /input-group -->
 					</div>
-					<div class="bs-sidebar affix">
-						<ul class="nav bs-sidenav" id="methods">
-						</ul>
-					</div>
 				</div>
-
+				<div class="bs-sidebar affix">
+					<ul class="nav bs-sidenav" id="methods">
+					</ul>
+				</div>
 			</div>
-		</div>
-	</div>
 
-	<div id="footer">
-		<div class="container">
-			<p class="text-muted credit">JSON-RPC Browser courtesy <a href="http://angrycamel.com">Rob Newton</a> (AngryCamel).</p>
 		</div>
 	</div>
 
@@ -210,17 +199,11 @@
 	<script>window.jQuery || document.write('<script src="js/vendor/jquery-1.10.2.min.js"><\/script>')</script>
 	<script src="js/vendor/jquery.json-2.4.js"></script>
 	<script src="js/vendor/jquery.jsonrpcclient.js"></script>
-	<script src="js/vendor/jquery.serialize-object.compiled.js"></script>
 	<script src="js/vendor/bootstrap.js"></script>
-	<script src="js/vendor/bootstrap-switch.min.js"></script>
 	<script src="js/vendor/bootstrap-slider.js"></script>
-	<script src="js/vendor/prettyCheckable.js"></script>
-	<script src="js/vendor/fuelux/require.js"></script>
-	<script src="js/vendor/fuelux/loader.min.js"></script>
-	<script src="js/vendor/fuelux/all.min.js"></script>
+	<script src="js/vendor/fuelux-pillbox-mod.js"></script>
 	<script src="js/vendor/timestamp.js"></script>
 	<script src="js/vendor/freemarker.js"></script>
-
 	<script src="js/jsonrpc.formbuilder.js"></script>
 	<script src="js/jsonrpc.schemahelper.js"></script>
 	<script src="js/jsonrpc.renderer.js"></script>

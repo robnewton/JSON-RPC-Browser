@@ -1,7 +1,14 @@
 
   #connection-panel {
-    /*display: none;*/
-    z-index: 502;
+    display: none;
+  }
+
+  #connection-panel.affix {
+    top: 70px;
+    height: 150px;
+    background-color: #fff;
+    width: 100%;
+    z-index: 800;
   }
 
   .fixed {
@@ -50,4 +57,11 @@
   -------------------------------------------------- */
   .btn-xs {
     padding: 1px 5px;
+  }
+
+  /* Panel mods
+  -------------------------------------------------- */
+  .panel_disabled {
+    margin-bottom: 0px;
+    margin-top: 15px;
   }
